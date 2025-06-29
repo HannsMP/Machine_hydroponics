@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hidroponia</title>
+  <link rel="stylesheet" href="/src/css/style.css">
+  <script src="/src/jquery/jquery-3.7.1.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <img id="background" src="/src/img/background.png" style="width: 100%; height: 100%;">
+    <div id="control-panel">
+      <div class="tanque" id="tanque-0">
+        <div class="nivel" style="height: 50%;"></div>
+      </div>
+      <div class="tanque" id="tanque-1">
+        <div class="nivel" style="height: 50%;"></div>
+      </div>
+      <div class="tanque" id="tanque-2">
+        <div class="nivel" style="height: 50%;"></div>
+      </div>
+      <div class="tanque" id="tanque-3">
+        <div class="nivel" style="height: 50%;"></div>
+      </div>
+      <div id="luminaria">
+        <div class="luz"></div>
+      </div>
+      <div class="bomba" id="bomba">
+        <div class="estado"></div>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/src/js/connection.js"></script>
+</body>
+
+</html>

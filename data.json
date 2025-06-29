@@ -1,0 +1,25 @@
+{
+  "PROCESS": {
+    "STATE": 0,
+    "INPUT": {
+      "CUTS": 0,
+      "LENGTH": 0,
+      "LENGTHTOTAL": 0,
+      "TEMPERATURE": 0,
+      "CHARGE": 0
+    },
+    "FACTS": {
+      "CUTS": 0,
+      "LENGTH": 0,
+      "LENGTHTOTAL": 0,
+      "TEMPERATURE": 0,
+      "ADJUSTMENT": 0,
+      "FEVER": 0
+    },
+    "READY": {
+      "MRS": 0,
+      "MCS": 0,
+      "TCS": 0
+    }
+  }
+}

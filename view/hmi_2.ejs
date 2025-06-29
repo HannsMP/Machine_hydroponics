@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control</title>
+  <link rel="stylesheet" href="/src/css/style.css">
+  <script src="/src/jquery/jquery-3.7.1.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <canvas id="dot-grid" style="display: block;"></canvas>
+    <div class="control-box">
+      <div class="control-form">
+  
+        <form>
+          <div class="form-tittle">
+            <h3>CORTADORA AUTOMÁTICA</h3>
+          </div>
+          <div class="input-box">
+            <div class="input-label">
+              Cantidad de cortes (u):
+            </div>
+            <div class="input">
+              <i class="bx bxs-minus-square">
+                <svg width="24" height="24" viewBox="0 0 24 24">
+                  <path d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5zm12 10H7v-2h10v2z">
+                  </path>
+                </svg>
+              </i>
+              <input id="cortes" name="cortes" type="text" placeholder="unidades" autofocus required>
+              <i class="bx bxs-plus-square">
+                <svg width="24" height="24" viewBox="0 0 24 24">
+                  <path
+                    d="M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2zm2-10h4V7h2v4h4v2h-4v4h-2v-4H7v-2z">
+                  </path>
+                </svg>
+              </i>
+            </div>
+          </div>
+          <div class="input-box">
+            <div class="input-label">
+              Longitud de cortes (m):
+            </div>
+            <div class="input">
+              <i class="bx bxs-minus-square">
+                <svg width="24" height="24" viewBox="0 0 24 24">
+                  <path d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5zm12 10H7v-2h10v2z">
+                  </path>
+                </svg>
+              </i>
+              <input id="longitud" name="longitud" type="text" step="0.01" placeholder="metros" required>
+              <i class="bx bxs-plus-square">
+                <svg width="24" height="24" viewBox="0 0 24 24">
+                  <path
+                    d="M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2zm2-10h4V7h2v4h4v2h-4v4h-2v-4H7v-2z">
+                  </path>
+                </svg>
+              </i>
+            </div>
+          </div>
+          <div class="input-box">
+            <div class="input-label">
+              Temperatura:
+              <span>medio</span>
+            </div>
+            <div class="range">
+              <input id="temperatura" name="temperatura" type="range" value="2" min="1" max="3" required>
+            </div>
+          </div>
+        </form>
+  
+        <div class="ready">
+          <div>
+            <div class="motor_cortadora">
+              MC<div class="state"></div>
+            </div>
+            <div class="motor_rodillo" style="display: none;">
+              MR<div class="state"></div>
+            </div>
+            <div class="termo_cupla">
+              TC<div class="state"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="charge" style="display: none;">
+          <div class="bar"></div>
+          <div class="bar-data">
+            <span class="bar-state"></span>
+            <span class="bar-text"></span>
+          </div>
+        </div>
+  
+        <div class="button">
+          <div id="play-pause">
+            <button id="play">Empezar</button>
+            <button id="pause">Parar</button>
+          </div>
+  
+          <div id="stop-reset" style="display: none;">
+            <button id="stop" style="display: none;">Parada de Emergencia</button>
+            <button id="reset" style="display: none;">Reiniciar</button>
+          </div>
+        </div>
+      </div>
+      <div class="control">
+        <div class="update">
+          <span class="cortes" >Cortes: <small>0/0</small></span>
+          <span class="longitud">Longitud: <small>0/0</small></span>
+          <span class="temperatura">Temperatura: <small>0/0</small></span>
+        </div>
+        <div class="logger">
+          <div class="data">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/src/js/grid.js"></script>
+  <script src="/src/js/connection.js"></script>
+
+  <!-- <script src="/src/js/engine.js"></script> -->
+</body>
+
+</html>
