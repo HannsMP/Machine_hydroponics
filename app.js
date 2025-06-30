@@ -24,7 +24,7 @@ class App {
 
     this.app.use('/src', express.static(resolve('src')));
 
-    this.app.use('/', morgan(':method :status :response-time ms - :url'));
+    // this.app.use('/', morgan(':method :status :response-time ms - :url'));
 
     /* ruta inicial */
     this.app.get('/', (req, res) => {
@@ -47,7 +47,6 @@ class App {
           return rej(err);
         try {
           let net = networkInterfaces();
-          console.log(net);
           this.ip = (
             net["Ethernet"] || net["Ethernet 3"] || net["Wi-Fi"] || net['Ethernet 5']
           )[1].address;

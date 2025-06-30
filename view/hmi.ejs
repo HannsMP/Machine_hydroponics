@@ -11,25 +11,189 @@
 
 <body>
   <div class="container">
-    <img id="background" src="/src/img/background.png" style="width: 100%; height: 100%;">
-    <div id="control-panel">
+    <img id="background" src="/src/img/background_2k.png" style="width: 100%; height: 100%;">
+
+    <div id="panel-state">
+      <!-- Taque principal -->
+
       <div class="tanque" id="tanque-0">
-        <div class="nivel" style="height: 50%;"></div>
+        <div class="nivel" style="height: 20%;"></div>
+        <div class="data">
+          <div class="info">
+            <span>PH: <span id="ph-value">7.0</span></span>
+          </div>
+          <div class="info">
+            <span>EC: <span id="ec-value">2.0</span></span>
+          </div>
+          <div class="info">
+            <span>TEMP: <span id="temp-value">25</span>°C</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Taque 1 -->
       <div class="tanque" id="tanque-1">
-        <div class="nivel" style="height: 50%;"></div>
+        <div class="nivel" style="height: 40%;"></div>
       </div>
+
+      <!-- Taque 2 -->
       <div class="tanque" id="tanque-2">
-        <div class="nivel" style="height: 50%;"></div>
+        <div class="nivel" style="height: 30%;"></div>
       </div>
+
+      <!-- Taque 3 -->
       <div class="tanque" id="tanque-3">
-        <div class="nivel" style="height: 50%;"></div>
+        <div class="nivel" style="height: 10%;"></div>
       </div>
+
+      <!-- Luminaria -->
       <div id="luminaria">
-        <div class="luz"></div>
+        <div class="foco">
+          <div class="luz"></div>
+        </div>
+        <div class="data">
+          <div class="info">
+            <span>LUX: <span id="luminaria-value">0</span></span>
+          </div>
+        </div>
       </div>
-      <div class="bomba" id="bomba">
-        <div class="estado"></div>
+
+      <!-- Bomba oxigenadora -->
+      <div class="bomba" id="oxigenador"> </div>
+
+      <!-- Bombas de hidraulica  1 -->
+      <div class="bomba" id="bomba-1">
+        <div class="data">
+          <div class="info">
+            <span>SPEED: <span id="bomba-1-speed">0</span>%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bombas de hidraulica  2 -->
+      <div class="bomba" id="bomba-2">
+        <div class="data">
+          <div class="info">
+            <span>SPEED: <span id="bomba-2-speed">0</span>%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bombas de hidraulica  3 -->
+      <div class="bomba" id="bomba-3">
+        <div class="data">
+          <div class="info">
+            <span>SPEED: <span id="bomba-3-speed">0</span>%</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="panel-control">
+      <!-- Luminaria -->
+      <div class="hitbox show" id="hitbox-1">
+        <div class="dashboard" style="display: none;">
+          <div class="form">
+            <div class="input-box">
+              <span>LUX_SP:</span>
+              <input type="number" id="luminaria-sp">
+            </div>
+            <div class="btn-save">
+              <input type="button" id="guardar-luminaria-sp" value="SAVE">
+            </div>
+            <div class="btn-box">
+              <span>STATE:</span>
+              <input type="button" id="luminaria-on" value="ON">
+              <input type="button" id="luminaria-off" value="OFF">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bomba oxigenadora -->
+      <div class="hitbox show" id="hitbox-2">
+        <div class="dashboard" style="display: none;">
+          <div class="form">
+            <div class="input-box">
+              <span>T_ON:</span>
+              <input type="number" id="oxigenador-t-on">
+            </div>
+            <div class="input-box">
+              <span>T_OFF:</span>
+              <input type="number" id="oxigenador-t-off">
+            </div>
+            <div class="btn-save">
+              <input type="button" id="guardar-oxigenador-t" value="SAVE">
+            </div>
+            <div class="btn-box">
+              <span>STATE:</span>
+              <input type="button" id="oxigenador-btn-on" value="ON">
+              <input type="button" id="oxigenador-btn-off" value="OFF">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bombas de hidraulica  1 -->
+      <div class="hitbox show" id="hitbox-3">
+        <div class="dashboard" style="display: none;">
+          <div class="form">
+            <div class="input-box">
+              <span>SPEED_SP:</span>
+              <input type="number" id="bomba-1-speed">
+            </div>
+            <div class="btn-save">
+              <input type="button" id="guardar-bomba-1-speed" value="SAVE">
+            </div>
+            <div class="btn-box">
+              <span>STATE:</span>
+              <input type="button" id="bomba-1-on" value="ON">
+              <input type="button" id="bomba-1-off" value="OFF">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bombas de hidraulica  2 -->
+      <div class="hitbox show" id="hitbox-4">
+        <div class="dashboard" style="display: none;">
+          <div class="form">
+            <div class="input-box">
+              <span>SPEED_SP:</span>
+              <input type="number" id="bomba-2-speed">
+            </div>
+            <div class="btn-save">
+              <input type="button" id="guardar-bomba-2-speed" value="SAVE">
+            </div>
+            <div class="btn-box">
+              <span>STATE:</span>
+              <input type="button" id="bomba-2-on" value="ON">
+              <input type="button" id="bomba-2-off" value="OFF">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bombas de hidraulica  3 -->
+      <div class="hitbox show" id="hitbox-5">
+        <div class="dashboard" style="display: none;">
+          <div class="form">
+            <div class="input-box">
+              <span>SPEED_SP:</span>
+              <input type="number" id="bomba-3-speed">
+            </div>
+            <div class="btn-save">
+              <input type="button" id="guardar-bomba-3-speed" value="SAVE">
+            </div>
+            <div class="btn-box">
+              <span>STATE:</span>
+              <input type="button" id="bomba-3-on" value="ON">
+              <input type="button" id="bomba-3-off" value="OFF">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <script src="/socket.io/socket.io.js"></script>
