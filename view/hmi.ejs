@@ -26,7 +26,7 @@
             <span>EC: <span id="ec-value">2.0</span></span>
           </div>
           <div class="info">
-            <span>TEMP: <span id="temp-value">25</span>°C</span>
+            <span>TEMP: <span id="temp-value">25</span>C°</span>
           </div>
         </div>
       </div>
@@ -65,7 +65,7 @@
       <div class="bomba" id="bomba-1">
         <div class="data">
           <div class="info">
-            <span>SPEED: <span id="bomba-1-speed">0</span>%</span>
+            <span>SPEED: <span id="bomba-1-speed-value">0</span>%</span>
           </div>
         </div>
       </div>
@@ -74,7 +74,7 @@
       <div class="bomba" id="bomba-2">
         <div class="data">
           <div class="info">
-            <span>SPEED: <span id="bomba-2-speed">0</span>%</span>
+            <span>SPEED: <span id="bomba-2-speed-value">0</span>%</span>
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@
       <div class="bomba" id="bomba-3">
         <div class="data">
           <div class="info">
-            <span>SPEED: <span id="bomba-3-speed">0</span>%</span>
+            <span>SPEED: <span id="bomba-3-speed-value">0</span>%</span>
           </div>
         </div>
       </div>
@@ -92,12 +92,13 @@
 
     <div id="panel-control">
       <!-- Luminaria -->
-      <div class="hitbox show" id="hitbox-1">
+      <div class="hitbox" id="hitbox-1">
         <div class="dashboard" style="display: none;">
           <div class="form">
             <div class="input-box">
               <span>LUX_SP:</span>
-              <input type="number" id="luminaria-sp">
+              <input type="number" id="luminaria-sp" value="70" min="0" max="100">
+              <span>%</span>
             </div>
             <div class="btn-save">
               <input type="button" id="guardar-luminaria-sp" value="SAVE">
@@ -112,16 +113,18 @@
       </div>
 
       <!-- Bomba oxigenadora -->
-      <div class="hitbox show" id="hitbox-2">
+      <div class="hitbox" id="hitbox-2">
         <div class="dashboard" style="display: none;">
           <div class="form">
             <div class="input-box">
               <span>T_ON:</span>
-              <input type="number" id="oxigenador-t-on">
+              <input type="number" id="oxigenador-t-on" value="60" min="0">
+              <span>seg</span>
             </div>
             <div class="input-box">
               <span>T_OFF:</span>
-              <input type="number" id="oxigenador-t-off">
+              <input type="number" id="oxigenador-t-off" value="60" min="0">
+              <span>seg</span>
             </div>
             <div class="btn-save">
               <input type="button" id="guardar-oxigenador-t" value="SAVE">
@@ -136,12 +139,13 @@
       </div>
 
       <!-- Bombas de hidraulica  1 -->
-      <div class="hitbox show" id="hitbox-3">
+      <div class="hitbox" id="hitbox-3">
         <div class="dashboard" style="display: none;">
           <div class="form">
             <div class="input-box">
               <span>SPEED_SP:</span>
-              <input type="number" id="bomba-1-speed">
+              <input type="number" id="bomba-1-speed" value="100" min="0" max="100">
+              <span>%</span>
             </div>
             <div class="btn-save">
               <input type="button" id="guardar-bomba-1-speed" value="SAVE">
@@ -156,12 +160,13 @@
       </div>
 
       <!-- Bombas de hidraulica  2 -->
-      <div class="hitbox show" id="hitbox-4">
+      <div class="hitbox" id="hitbox-4">
         <div class="dashboard" style="display: none;">
           <div class="form">
             <div class="input-box">
               <span>SPEED_SP:</span>
-              <input type="number" id="bomba-2-speed">
+              <input type="number" id="bomba-2-speed" value="100" min="0" max="100">
+              <span>%</span>
             </div>
             <div class="btn-save">
               <input type="button" id="guardar-bomba-2-speed" value="SAVE">
@@ -176,12 +181,13 @@
       </div>
 
       <!-- Bombas de hidraulica  3 -->
-      <div class="hitbox show" id="hitbox-5">
+      <div class="hitbox" id="hitbox-5">
         <div class="dashboard" style="display: none;">
           <div class="form">
             <div class="input-box">
               <span>SPEED_SP:</span>
-              <input type="number" id="bomba-3-speed">
+              <input type="number" id="bomba-3-speed" value="100" min="0" max="100">
+              <span>%</span>
             </div>
             <div class="btn-save">
               <input type="button" id="guardar-bomba-3-speed" value="SAVE">
@@ -194,10 +200,20 @@
           </div>
         </div>
       </div>
+
+      <div class="btn-box" id="control">
+        <input type="button" id="control-manual" value="CONTROL MANUAL">
+        <input type="button" id="control-automatico" value="CONTROL AUTOMATICO">
+      </div>
     </div>
   </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/src/js/connection.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      window.hidroponia = new HidroponiaUI();
+    });
+  </script>
 </body>
 
 </html>
