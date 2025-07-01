@@ -14,12 +14,18 @@ type DataGlobal = {
   "oxygenatorState": number
   "bomb1ShowPointSpeed": number
   "bomb1SetPointSpeed": number
+  "bomb1SetPointtimeOn": number
+  "bomb1SetPointtimeOff": number
   "bomb1State": number
   "bomb2ShowPointSpeed": number
   "bomb2SetPointSpeed": number
+  "bomb2SetPointtimeOn": number
+  "bomb2SetPointtimeOff": number
   "bomb2State": number
   "bomb3ShowPointSpeed": number
   "bomb3SetPointSpeed": number
+  "bomb3SetPointtimeOn": number
+  "bomb3SetPointtimeOff": number
   "bomb3State": number
   "phosphoricAcidShowPointLevel": number
   "nutrientSolutionAShowPointLevel": number

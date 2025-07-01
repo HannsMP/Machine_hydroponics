@@ -23,15 +23,25 @@ class HidroponiaUI {
 
     bomb1ShowPointSpeed: 0, // 0-100
     bomb1SetPointSpeed: 0, // 0-100
+    bomb1SetPointtimeOn: 0, // 0-inf
+    bomb1SetPointtimeOff: 0, // 0-inf
     bomb1State: 0, // 0-1
 
     bomb2ShowPointSpeed: 0, // 0-100
     bomb2SetPointSpeed: 0, // 0-100
+    bomb2SetPointtimeOn: 0, // 0-inf
+    bomb2SetPointtimeOff: 0, // 0-inf
     bomb2State: 0, // 0-1
 
     bomb3ShowPointSpeed: 0, // 0-100
     bomb3SetPointSpeed: 0, // 0-100
+    bomb3SetPointtimeOn: 0, // 0-inf
+    bomb3SetPointtimeOff: 0, // 0-inf
     bomb3State: 0, // 0-1
+
+    nutrientSolutionAShowPointLevel,
+    nutrientSolutionBShowPointLevel,
+    phosphoricAcidShowPointLevel
   }
 
   #updateControl() {
