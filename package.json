@@ -17,11 +17,11 @@
     "express": "4.19.2",
     "morgan": "1.10.0",
     "mqtt": "5.7.2",
+    "save-dev": "0.0.1-security",
     "socket.io": "4.7.5"
   },
   "devDependencies": {
-    "datatables.net-dt": "2.0.8",
-    "jquery": "3.7.1",
+    "@types/socket.io": "3.0.1",
     "nodemon": "3.1.4"
   },
   "repository": {

@@ -1,30 +1,6 @@
-/**
- * @typedef {{
- *   mode: 'MANUAL' | 'AUTOMATICO'
- *   hydroponicTankShowPointLevel: number
- *   hydroponicTankShowPH: number
- *   hydroponicTankShowEC: number
- *   hydroponicTankShowTEMP: number
- *   luminarySetPointIntensity: number
- *   luminaryShowPointIntensity: number
- *   luminaryState: number
- *   oxygenatorSetPointtimeOn: number
- *   oxygenatorSetPointtimeOff: number
- *   oxygenatorState: number
- *   bomb1ShowPointSpeed: number
- *   bomb1SetPointSpeed: number
- *   bomb1State: number
- *   bomb2ShowPointSpeed: number
- *   bomb2SetPointSpeed: number
- *   bomb2State: number
- *   bomb3ShowPointSpeed: number
- *   bomb3SetPointSpeed: number
- *   bomb3State: number
- *   phosphoricAcidShowPointLevel: number
- *   nutrientSolutionAShowPointLevel: number
- *   nutrientSolutionBShowPointLevel: number
- * }} DataGlobal
- */
+/** @typedef {import('../../types/types').DataGlobal} DataGlobal */
+/** @typedef {import('../../types/types').DataEvent} DataEvent */
+/** @typedef {import('../../types/types').SoketData} SoketData */
 
 class HidroponiaUI {
 
@@ -76,33 +52,39 @@ class HidroponiaUI {
     let state = this.#data.luminaryState;
     this.luminary.btnOn.disabled = state;
     this.luminary.btnOff.disabled = !state;
+    this.luminary.showPointFocus.classList.toggle('active', state)
   }
 
   #updateBtnHitbox2() {
     let state = this.#data.oxygenatorState;
     this.oxygenator.btnOn.disabled = state;
     this.oxygenator.btnOff.disabled = !state;
+    this.oxygenator.showPointState
   }
 
   #updateBtnHitbox3() {
-    let state = this.#data.luminaryState;
+    let state = this.#data.bomb1State;
     this.phosphoricAcid.btnOn.disabled = state;
     this.phosphoricAcid.btnOff.disabled = !state;
   }
 
   #updateBtnHitbox4() {
-    let state = this.#data.luminaryState;
+    let state = this.#data.bomb2State;
     this.nutrientSolutionA.btnOn.disabled = state;
     this.nutrientSolutionA.btnOff.disabled = !state;
   }
 
   #updateBtnHitbox5() {
-    let state = this.#data.luminaryState;
+    let state = this.#data.bomb3State;
     this.nutrientSolutionB.btnOn.disabled = state;
     this.nutrientSolutionB.btnOff.disabled = !state;
+    this.nutrientSolutionB
   }
 
-  constructor() {
+  constructor(data = {}) {
+    this.#data = { ...this.#data, ...data };
+
+    /** @type {SoketData} */
     this.socket = io();
 
     this.luminary = {
@@ -199,12 +181,12 @@ class HidroponiaUI {
     this.btnControlManual.addEventListener('click', () => {
       this.#data.mode = 'MANUAL';
       this.#updateControl();
-      this.socket.emit('control-config', 'MANUAL')
+      this.socket.emit('control-config', 'MANUAL');
     });
     this.btnControlAutomatico.addEventListener('click', () => {
       this.#data.mode = 'AUTOMATICO';
       this.#updateControl();
-      this.socket.emit('control-config', 'AUTOMATICO')
+      this.socket.emit('control-config', 'AUTOMATICO');
     });
 
     // cerrar dashboards si clic fuera
@@ -308,28 +290,18 @@ class HidroponiaUI {
     /* click off */
 
     this.luminary.btnOff.addEventListener("click", () => {
-      // this.#data.luminaryState = 0;
-      // this.#updateBtnHitbox1();
       this.socket.emit('luminary-state', { state: 0 });
     });
     this.oxygenator.btnOff.addEventListener("click", () => {
-      // this.#data.oxygenatorState = 0;
-      // this.#updateBtnHitbox2();
       this.socket.emit('oxygenator-state', { state: 0 });
     });
     this.phosphoricAcid.btnOff.addEventListener("click", () => {
-      // this.#data.bomb1State = 0;
-      // this.#updateBtnHitbox3();
       this.socket.emit('phosphoricAcid-state', { state: 0 });
     });
     this.nutrientSolutionA.btnOff.addEventListener("click", () => {
-      // this.#data.bomb2State = 0;
-      // this.#updateBtnHitbox4();
       this.socket.emit('nutrientSolutionA-state', { state: 0 });
     });
     this.nutrientSolutionB.btnOff.addEventListener("click", () => {
-      // this.#data.bomb3State = 0;
-      // this.#updateBtnHitbox5();
       this.socket.emit('nutrientSolutionB-state', { state: 0 });
     });
 
@@ -350,13 +322,34 @@ class HidroponiaUI {
 
   setupSocket() {
     this.socket.on('update-data', data => {
-      this.#updateIfDiff(this.luminary.setPoint, 'luminarySetPointIntensity', data.luminarySetPointIntensity);
-      this.#updateIfDiff(this.oxygenator.setPointTimeOn, 'oxygenatorSetPointtimeOn', data.oxygenatorSetPointtimeOn);
-      this.#updateIfDiff(this.oxygenator.setPointTimeOff, 'oxygenatorSetPointtimeOff', data.oxygenatorSetPointtimeOff);
+      this.#data.luminaryState = 0;
+      this.#updateBtnHitbox1();
+      this.#data.oxygenatorState = 0;
+      this.#updateBtnHitbox2();
+      this.#data.bomb1State = 0;
+      this.#updateBtnHitbox3();
+      this.#data.bomb2State = 0;
+      this.#updateBtnHitbox4();
+      this.#data.bomb3State = 0;
+      this.#updateBtnHitbox5();
 
-      this.#updateIfDiff(this.phosphoricAcid.setPointBombspeed, 'bomb1SetPointSpeed', data.bomb1SetPointSpeed);
-      this.#updateIfDiff(this.nutrientSolutionA.setPointBombspeed, 'bomb2SetPointSpeed', data.bomb2SetPointSpeed);
-      this.#updateIfDiff(this.nutrientSolutionB.setPointBombspeed, 'bomb3SetPointSpeed', data.bomb3SetPointSpeed);
+      if (this.#data.luminarySetPointIntensity !== data.luminarySetPointIntensity)
+        this.luminary.setPoint.value = data.luminarySetPointIntensity;
+
+      if (this.#data.oxygenatorSetPointtimeOn !== data.oxygenatorSetPointtimeOn)
+        this.oxygenator.setPointTimeOn.value = data.oxygenatorSetPointtimeOn;
+
+      if (this.#data.oxygenatorSetPointtimeOff !== data.oxygenatorSetPointtimeOff)
+        this.oxygenator.setPointTimeOff.value = data.oxygenatorSetPointtimeOff;
+
+      if (this.#data.bomb1SetPointSpeed !== data.bomb1SetPointSpeed)
+        this.phosphoricAcid.setPointBombspeed.value = data.bomb1SetPointSpeed;
+
+      if (this.#data.bomb2SetPointSpeed !== data.bomb2SetPointSpeed)
+        this.nutrientSolutionA.setPointBombspeed.value = data.bomb2SetPointSpeed;
+
+      if (this.#data.bomb3SetPointSpeed !== data.bomb3SetPointSpeed)
+        this.nutrientSolutionB.setPointBombspeed.value = data.bomb3SetPointSpeed;
 
       this.#data = { ...this.#data, ...data };
 
@@ -386,6 +379,5 @@ class HidroponiaUI {
     this.nutrientSolutionB.showPointLevel.style.height = this.#data.nutrientSolutionBShowPointLevel + '%';
     this.nutrientSolutionB.showPointBombState.classList.toggle('active', this.#data.bomb3State);
     this.nutrientSolutionB.showPointBombSpeed.textContent = this.#data.bomb3ShowPointSpeed + '%';
-
   }
 }
