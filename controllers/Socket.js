@@ -56,7 +56,6 @@ class Socket {
   luminary_config(data) {
     let { sp } = data;
     let scale = this.app.scale(sp, 0, 100, 0, 65535);
-    console.log(sp, scale);
 
     this.app.mqtt.REQ_HREG_LUX_SP(scale);
   }
