@@ -7,7 +7,7 @@ const Jsoning = require('./controllers/jsoning');
 const Socket = require('./controllers/Socket');
 const Mqtt = require('./controllers/Mqtt');
 const Logger = require('./controllers/Logger');
-const { networkInterfaces } = require('os');
+const { networkInterfaces, type } = require('os');
 
 class App {
   app = express();
@@ -28,15 +28,19 @@ class App {
 
     /* ruta inicial */
     this.app.get('/', (req, res) => {
-      res.render(resolve('view', 'hmi.ejs'))
+      res.render(resolve('view', 'hmi.ejs'), {
+        data: this.db.DATA
+      })
     })
 
-    this.app.get('/logger', (req, res) => {
-      this.logger.log('holaaaaa', "success")
-      res.json({confim: true})
-    })
+    this.start();
+    this.Listen();
+  }
 
-    this.Listen()
+  start() {
+    setInterval(() => {
+      this.mqtt.REQ_ALL_DATA();
+    }, 1000);
   }
 
   Listen() {
@@ -51,12 +55,26 @@ class App {
             net["Ethernet"] || net["Ethernet 3"] || net["Wi-Fi"] || net['Ethernet 5']
           )[1].address;
         } catch (error) {
-          
+
         }
         console.log(`[App] http://${this.ip}:${port}`);
         res();
       })
     })
+  }
+
+  /**
+   * @param {number} value 
+   * @param {number} a_min 
+   * @param {number} a_max 
+   * @param {number} b_min 
+   * @param {number} b_max 
+   */
+  scale(value, a_min, a_max, b_min, b_max) {
+    if (value < a_min) value = a_min;
+    if (value > a_max) value = a_max;
+    let res = ((value - a_min) / (a_max - a_min)) * (b_max - b_min) + b_min;
+    return res || 0;
   }
 }
 

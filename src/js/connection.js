@@ -1,51 +1,55 @@
-/** @typedef {import('../../types/types').DataGlobal} DataGlobal */
+/** @typedef {import('../../types/types').DataClient} DataClient */
 /** @typedef {import('../../types/types').DataEvent} DataEvent */
 /** @typedef {import('../../types/types').SocketData} SocketData */
 
 class HidroponiaUI {
 
-  /** @type {DataGlobal} */
+  /** @type {DataClient} */
   #data = {
-    mode: 'MANUAL',
+    IREG_LSL: 0, // 0-100
+    IREG_TDS_RAW: 0, // 0-inf
+    IREG_PH_RAW: 0, // 0-inf
+    IREG_TEMP_RAW: 0, // 0-inf
+    IREG_LIGHT_LUX: 0, // 0-100
+    STATUS_LIGHT: 0,
+    STATUS_AIR: 0,
+    STATUS_BOMBA_0: 0, // 0-1
+    STATUS_BOMBA_2: 0, // 0-1
+    STATUS_BOMBA_3: 0, // 0-1
+    HREG_BOMBA_0: 0, // 0-100
+    HREG_BOMBA_2: 0, // 0-100
+    HREG_BOMBA_3: 0, // 0-100
+    nutrientSolutionAShowPointLevel: 70, // 0-100
+    nutrientSolutionBShowPointLevel: 70, // 0-100
+    phosphoricAcidShowPointLevel: 70, // 0-100
 
-    hydroponicTankShowPointLevel: 0, // 0-100
-    hydroponicTankShowPH: 0, // 0-inf
-    hydroponicTankShowEC: 0, // 0-inf
-    hydroponicTankShowTEMP: 0, // 0-inf
+    HREG_MODE: 0, // 0-1
+    COIL_LIGHT: 0, // 0-1
+    COIL_AIR_PUMP: 0, // 0-1
+    COIL_BOMBA_0: 0, // 0-1
+    COIL_BOMBA_2: 0, // 0-1
+    COIL_BOMBA_3: 0, // 0-1
 
-    luminarySetPointIntensity: 0, // 0-100
-    luminaryShowPointIntensity: 0, // 0-100
-    luminaryState: 0, // 0-1
+    HREG_LIGHT_PWM: 0, // 0-100
 
-    oxygenatorSetPointtimeOn: 0, // 0-inf
-    oxygenatorSetPointtimeOff: 0, // 0-inf
-    oxygenatorState: 0, // 0-1
+    HREG_AIR_ON_TIME: 0, // 0-inf
+    HREG_AIR_OFF_TIME: 0, // 0-inf
 
-    bomb1ShowPointSpeed: 0, // 0-100
-    bomb1SetPointSpeed: 0, // 0-100
-    bomb1SetPointtimeOn: 0, // 0-inf
-    bomb1SetPointtimeOff: 0, // 0-inf
-    bomb1State: 0, // 0-1
+    HREG_LUX_SP: 0,
+    HREG_B1_SP: 0, // 0-100
+    HREG_B2_SP: 0, // 0-100
+    HREG_B3_SP: 0, // 0-100
 
-    bomb2ShowPointSpeed: 0, // 0-100
-    bomb2SetPointSpeed: 0, // 0-100
-    bomb2SetPointtimeOn: 0, // 0-inf
-    bomb2SetPointtimeOff: 0, // 0-inf
-    bomb2State: 0, // 0-1
-
-    bomb3ShowPointSpeed: 0, // 0-100
-    bomb3SetPointSpeed: 0, // 0-100
-    bomb3SetPointtimeOn: 0, // 0-inf
-    bomb3SetPointtimeOff: 0, // 0-inf
-    bomb3State: 0, // 0-1
-
-    nutrientSolutionAShowPointLevel: 0,
-    nutrientSolutionBShowPointLevel: 0,
-    phosphoricAcidShowPointLevel: 0
+    HREG_B1_ON_TIME: 0, // 0-inf
+    HREG_B1_OFF_TIME: 0, // 0-inf
+    HREG_B2_ON_TIME: 0, // 0-inf
+    HREG_B2_OFF_TIME: 0, // 0-inf
+    HREG_B3_ON_TIME: 0, // 0-inf
+    HREG_B3_OFF_TIME: 0, // 0-inf
   }
 
   #updateControl() {
-    let manual = this.#data.mode === 'MANUAL';
+    let manual = this.#data.HREG_MODE === 0;
     this.btnControlManual.disabled = manual;
     this.btnControlAutomatico.disabled = !manual;
 
@@ -59,36 +63,43 @@ class HidroponiaUI {
   }
 
   #updateBtnHitbox1() {
-    let state = this.#data.luminaryState;
-    this.luminary.btnOn.disabled = state;
-    this.luminary.btnOff.disabled = !state;
-    this.luminary.showPointFocus.classList.toggle('active', state)
+    let { COIL_LIGHT, STATUS_LIGHT } = this.#data;
+    this.luminary.btnOn.disabled = COIL_LIGHT;
+    this.luminary.btnOff.disabled = !COIL_LIGHT;
+
+    this.luminary.showPointFocus.classList.toggle('active', STATUS_LIGHT);
   }
 
   #updateBtnHitbox2() {
-    let state = this.#data.oxygenatorState;
-    this.oxygenator.btnOn.disabled = state;
-    this.oxygenator.btnOff.disabled = !state;
-    this.oxygenator.showPointState
+    let { COIL_AIR_PUMP, STATUS_AIR } = this.#data;
+    this.oxygenator.btnOn.disabled = COIL_AIR_PUMP;
+    this.oxygenator.btnOff.disabled = !COIL_AIR_PUMP;
+
+    this.oxygenator.showPointState.classList.toggle('active', STATUS_AIR);
   }
 
   #updateBtnHitbox3() {
-    let state = this.#data.bomb1State;
-    this.phosphoricAcid.btnOn.disabled = state;
-    this.phosphoricAcid.btnOff.disabled = !state;
+    let { COIL_BOMBA_3, STATUS_BOMBA_3 } = this.#data;
+    this.phosphoricAcid.btnOn.disabled = COIL_BOMBA_3;
+    this.phosphoricAcid.btnOff.disabled = !COIL_BOMBA_3;
+
+    this.phosphoricAcid.showPointBombState.classList.toggle('active', STATUS_BOMBA_3);
   }
 
   #updateBtnHitbox4() {
-    let state = this.#data.bomb2State;
-    this.nutrientSolutionA.btnOn.disabled = state;
-    this.nutrientSolutionA.btnOff.disabled = !state;
+    let { COIL_BOMBA_0, STATUS_BOMBA_0 } = this.#data;
+    this.nutrientSolutionA.btnOn.disabled = COIL_BOMBA_0;
+    this.nutrientSolutionA.btnOff.disabled = !COIL_BOMBA_0;
+
+    this.nutrientSolutionA.showPointBombState.classList.toggle('active', STATUS_BOMBA_0);
   }
 
   #updateBtnHitbox5() {
-    let state = this.#data.bomb3State;
-    this.nutrientSolutionB.btnOn.disabled = state;
-    this.nutrientSolutionB.btnOff.disabled = !state;
-    this.nutrientSolutionB
+    let { COIL_BOMBA_2, STATUS_BOMBA_2 } = this.#data;
+    this.nutrientSolutionB.btnOn.disabled = COIL_BOMBA_2;
+    this.nutrientSolutionB.btnOff.disabled = !COIL_BOMBA_2;
+
+    this.nutrientSolutionB.showPointBombState.classList.toggle('active', STATUS_BOMBA_2);
   }
 
   constructor(data = {}) {
@@ -161,11 +172,32 @@ class HidroponiaUI {
       dashboard: document.querySelector('#hitbox-5 .dashboard')
     }
 
+    this.tankPH = {
+      setPointPH: document.getElementById('ph-sp'),
+      btnSave: document.getElementById('guardar-ph'),
+      hitbox: document.getElementById('hitbox-6'),
+      dashboard: document.querySelector('#hitbox-6 .dashboard')
+    }
+
+    this.tankECA = {
+      setPointEC: document.getElementById('ec-a-sp'),
+      btnSave: document.getElementById('guardar-ec-a'),
+      hitbox: document.getElementById('hitbox-7'),
+      dashboard: document.querySelector('#hitbox-7 .dashboard')
+    }
+
+    this.tankECB = {
+      setPointEC: document.getElementById('ec-b-sp'),
+      btnSave: document.getElementById('guardar-ec-b'),
+      hitbox: document.getElementById('hitbox-8'),
+      dashboard: document.querySelector('#hitbox-8 .dashboard')
+    }
+
     this.hydroponicTank = {
-      showPointLevel: document.querySelector('#tanque-0 .nivel'),
-      showPointPH: document.getElementById('ph-value'),
       showPintEC: document.getElementById('ec-value'),
-      showPointTEMP: document.getElementById('temp-value')
+      showPointPH: document.getElementById('ph-value'),
+      showPointLevel: document.querySelector('#tanque-0 .nivel'),
+      showPointTEMP: document.getElementById('temp-value'),
     }
 
     this.btnControlManual = document.getElementById('control-manual');
@@ -176,7 +208,10 @@ class HidroponiaUI {
       this.oxygenator,
       this.phosphoricAcid,
       this.nutrientSolutionA,
-      this.nutrientSolutionB
+      this.nutrientSolutionB,
+      this.tankECA,
+      this.tankECB,
+      this.tankPH
     ];
 
     this.updateInterface();
@@ -195,19 +230,19 @@ class HidroponiaUI {
 
   setupListeners() {
     this.btnControlManual.addEventListener('click', () => {
-      this.#data.mode = 'MANUAL';
+      this.#data.HREG_MODE = 0;
       this.#updateControl();
-      this.socket.emit('control-config', 'MANUAL');
+      this.socket.emit('control-config', { mode: 0 });
     });
     this.btnControlAutomatico.addEventListener('click', () => {
-      this.#data.mode = 'AUTOMATICO';
+      this.#data.HREG_MODE = 'AUTOMATICO';
       this.#updateControl();
-      this.socket.emit('control-config', 'AUTOMATICO');
+      this.socket.emit('control-config', { mode: 1 });
     });
 
     // cerrar dashboards si clic fuera
     document.addEventListener('click', e => {
-      if (this.#data.mode !== 'MANUAL')
+      if (this.#data.HREG_MODE !== 0)
         return;
 
       // Si el clic fue dentro de un dashboard o hitbox, NO cerrar nada
@@ -241,40 +276,44 @@ class HidroponiaUI {
 
     this.luminary.btnSave.addEventListener("click", () => {
       let sp = parseFloat(this.luminary.setPoint.value);
-      this.#data.luminarySetPointIntensity = sp;
       this.socket.emit('luminary-config', { sp });
     })
 
     this.oxygenator.btnSave.addEventListener("click", () => {
-      let t_on = parseInt(this.oxygenator.setPointTimeOn.value)
-      let t_off = parseInt(this.oxygenator.setPointTimeOff.value)
-      this.#data.oxygenatorSetPointtimeOn = t_on;
-      this.#data.oxygenatorSetPointtimeOff = t_off;
-      this.socket.emit('oxygenator-config', { t_on, t_off });
+      let timeOn = parseInt(this.oxygenator.setPointTimeOn.value)
+      let timeOff = parseInt(this.oxygenator.setPointTimeOff.value)
+      this.socket.emit('oxygenator-config', { timeOn, timeOff });
     })
 
     this.phosphoricAcid.btnSave.addEventListener("click", () => {
-      let t_on = parseInt(this.phosphoricAcid.setPointTimeOn.value);
-      let t_off = parseInt(this.phosphoricAcid.setPointTimeOff.value);
+      let timeOn = parseInt(this.phosphoricAcid.setPointTimeOn.value);
+      let timeOff = parseInt(this.phosphoricAcid.setPointTimeOff.value);
       let speed = parseInt(this.phosphoricAcid.setPointBombspeed.value);
-      this.#data.bomb1SetPointSpeed = speed;
-      this.socket.emit('phosphoricAcid-config', { t_on, t_off, speed });
+      this.socket.emit('phosphoricAcid-config', { timeOn, timeOff, speed });
     })
 
     this.nutrientSolutionA.btnSave.addEventListener("click", () => {
-      let t_on = parseInt(this.nutrientSolutionA.setPointTimeOn.value);
-      let t_off = parseInt(this.nutrientSolutionA.setPointTimeOff.value);
+      let timeOn = parseInt(this.nutrientSolutionA.setPointTimeOn.value);
+      let timeOff = parseInt(this.nutrientSolutionA.setPointTimeOff.value);
       let speed = parseInt(this.nutrientSolutionA.setPointBombspeed.value);
-      this.#data.bomb2SetPointSpeed = speed;
-      this.socket.emit('nutrientSolutionA-config', { t_on, t_off, speed });
+      this.socket.emit('nutrientSolutionA-config', { timeOn, timeOff, speed });
     })
 
     this.nutrientSolutionB.btnSave.addEventListener("click", () => {
-      let t_on = parseInt(this.nutrientSolutionB.setPointTimeOn.value);
-      let t_off = parseInt(this.nutrientSolutionB.setPointTimeOff.value);
+      let timeOn = parseInt(this.nutrientSolutionB.setPointTimeOn.value);
+      let timeOff = parseInt(this.nutrientSolutionB.setPointTimeOff.value);
       let speed = parseInt(this.nutrientSolutionB.setPointBombspeed.value);
-      this.#data.bomb3SetPointSpeed = speed;
-      this.socket.emit('nutrientSolutionB-config', { t_on, t_off, speed });
+      this.socket.emit('nutrientSolutionB-config', { timeOn, timeOff, speed });
+    })
+
+    this.tankPH.btnSave.addEventListener("click", () => {
+      let sp = parseInt(this.tankPH.setPointPH.value);
+      this.socket.emit('tankPH-config', { sp });
+    })
+
+    this.tankECA.btnSave.addEventListener("click", () => {
+      let sp = parseInt(this.tankECA.setPointEC.value);
+      this.socket.emit('tankECA-config', { sp });
     })
 
     /* click on */
@@ -321,7 +360,7 @@ class HidroponiaUI {
 
   /**
    * @param {HTMLInputElement} input 
-   * @param {keyof DataGlobal} key 
+   * @param {keyof DataClient} key 
    * @param {number} value 
    */
   #updateIfDiff(input, key, value) {
@@ -334,62 +373,108 @@ class HidroponiaUI {
 
   setupSocket() {
     this.socket.on('/update-data', data => {
-      this.#data.luminaryState = 0;
-      this.#updateBtnHitbox1();
-      this.#data.oxygenatorState = 0;
-      this.#updateBtnHitbox2();
-      this.#data.bomb1State = 0;
-      this.#updateBtnHitbox3();
-      this.#data.bomb2State = 0;
-      this.#updateBtnHitbox4();
-      this.#data.bomb3State = 0;
-      this.#updateBtnHitbox5();
-
-      if (this.#data.luminarySetPointIntensity !== data.luminarySetPointIntensity)
-        this.luminary.setPoint.value = data.luminarySetPointIntensity;
-
-      if (this.#data.oxygenatorSetPointtimeOn !== data.oxygenatorSetPointtimeOn)
-        this.oxygenator.setPointTimeOn.value = data.oxygenatorSetPointtimeOn;
-
-      if (this.#data.oxygenatorSetPointtimeOff !== data.oxygenatorSetPointtimeOff)
-        this.oxygenator.setPointTimeOff.value = data.oxygenatorSetPointtimeOff;
-
-      if (this.#data.bomb1SetPointSpeed !== data.bomb1SetPointSpeed)
-        this.phosphoricAcid.setPointBombspeed.value = data.bomb1SetPointSpeed;
-
-      if (this.#data.bomb2SetPointSpeed !== data.bomb2SetPointSpeed)
-        this.nutrientSolutionA.setPointBombspeed.value = data.bomb2SetPointSpeed;
-
-      if (this.#data.bomb3SetPointSpeed !== data.bomb3SetPointSpeed)
-        this.nutrientSolutionB.setPointBombspeed.value = data.bomb3SetPointSpeed;
+      this.#refreshInputsData(data);
 
       this.#data = { ...this.#data, ...data };
 
+      this.updateInterface();
       this.#refreshViewData();
     });
   }
 
+  /**
+   * @param {DataClient} data 
+   */
+  #refreshInputsData(data) {
+    // LUX-SP
+    console.log(this.#data.HREG_LIGHT_PWM, data.HREG_LIGHT_PWM);
+
+    if (this.#data.HREG_LIGHT_PWM !== data.HREG_LIGHT_PWM)
+      this.luminary.setPoint.value = data.HREG_LIGHT_PWM;
+
+    // AIR-T-ON
+    if (this.#data.HREG_AIR_ON_TIME !== data.HREG_AIR_ON_TIME)
+      this.oxygenator.setPointTimeOn.value = data.HREG_AIR_ON_TIME;
+    // AIR-T-OFF
+    if (this.#data.HREG_AIR_OFF_TIME !== data.HREG_AIR_OFF_TIME)
+      this.oxygenator.setPointTimeOff.value = data.HREG_AIR_OFF_TIME;
+
+    // BOMB-2-T-ON
+    if (this.#data.HREG_B1_ON_TIME !== data.HREG_B1_ON_TIME)
+      this.oxygenator.setPointTimeOn.value = data.HREG_B1_ON_TIME;
+    // BOMB-2-T-OFF
+    if (this.#data.HREG_B1_OFF_TIME !== data.HREG_B1_OFF_TIME)
+      this.oxygenator.setPointTimeOff.value = data.HREG_B1_OFF_TIME;
+    // BOMB-2-SPEED
+    if (this.#data.HREG_B1_SP !== data.HREG_B1_SP)
+      this.nutrientSolutionA.setPointBombspeed.value = data.HREG_B1_SP;
+
+    // BOMB-3-T-ON
+    if (this.#data.HREG_B2_ON_TIME !== data.HREG_B2_ON_TIME)
+      this.oxygenator.setPointTimeOn.value = data.HREG_B2_ON_TIME;
+    // BOMB-3-T-OFF
+    if (this.#data.HREG_B2_OFF_TIME !== data.HREG_B2_OFF_TIME)
+      this.oxygenator.setPointTimeOff.value = data.HREG_B2_OFF_TIME;
+    // BOMB-3-SPEED
+    if (this.#data.HREG_B2_SP !== data.HREG_B2_SP)
+      this.nutrientSolutionB.setPointBombspeed.value = data.HREG_B2_SP;
+
+    // BOMB-1-T-ON
+    if (this.#data.HREG_B3_ON_TIME !== data.HREG_B3_ON_TIME)
+      this.oxygenator.setPointTimeOn.value = data.HREG_B3_ON_TIME;
+    // BOMB-1-T-OFF
+    if (this.#data.HREG_B3_OFF_TIME !== data.HREG_B3_OFF_TIME)
+      this.oxygenator.setPointTimeOff.value = data.HREG_B3_OFF_TIME;
+    // BOMB-1-SPEED
+    if (this.#data.HREG_B3_SP !== data.HREG_B3_SP)
+      this.phosphoricAcid.setPointBombspeed.value = data.HREG_B3_SP;
+
+    // PH-SP
+    if (this.#data.HREG_PH_SP !== data.HREG_PH_SP)
+      this.phosphoricAcid.setPointBombspeed.value = data.HREG_PH_SP;
+
+    // EC-SP
+    if (this.#data.HREG_EC_SP !== data.HREG_EC_SP)
+      this.phosphoricAcid.setPointBombspeed.value = data.HREG_EC_SP;
+  }
+
   #refreshViewData() {
-    this.hydroponicTank.showPointLevel.style.height = this.#data.hydroponicTankShowPointLevel + '%';
-    this.hydroponicTank.showPointPH.textContent = this.#data.hydroponicTankShowPH.toFixed(1);
-    this.hydroponicTank.showPintEC.textContent = this.#data.hydroponicTankShowEC.toFixed(1);
-    this.hydroponicTank.showPointTEMP.textContent = this.#data.hydroponicTankShowTEMP + 'C°';
+    this.hydroponicTank.showPointLevel.style.height = (this.#data.IREG_LSL ? 90 : 30) + '%';
+    this.hydroponicTank.showPointPH.textContent = this.#parse_ph(this.#data.IREG_PH_RAW).toFixed(2);
+    this.hydroponicTank.showPintEC.textContent = this.#data.IREG_TDS_RAW.toFixed(2);
+    this.hydroponicTank.showPointTEMP.textContent = this.#parse_temp(this.#data.IREG_TEMP_RAW).toFixed(2);
 
-    this.luminary.showPointIntensity.textContent = this.#data.luminaryShowPointIntensity + 'lumenes';
-    this.luminary.showPointFocus.classList.toggle('active', this.#data.luminaryState);
-
-    this.oxygenator.showPointState.classList.toggle('active', this.#data.oxygenatorState);
+    this.luminary.showPointIntensity.textContent = this.#data.IREG_LIGHT_LUX;
 
     this.phosphoricAcid.showPointLevel.style.height = this.#data.phosphoricAcidShowPointLevel + '%';
-    this.phosphoricAcid.showPointBombState.classList.toggle('active', this.#data.bomb1State);
-    this.phosphoricAcid.showPointBombSpeed.textContent = this.#data.bomb1ShowPointSpeed + '%';
+    this.phosphoricAcid.showPointBombSpeed.textContent = this.#data.HREG_BOMBA_3;
 
     this.nutrientSolutionA.showPointLevel.style.height = this.#data.nutrientSolutionAShowPointLevel + '%';
-    this.nutrientSolutionA.showPointBombState.classList.toggle('active', this.#data.bomb2State);
-    this.nutrientSolutionA.showPointBombSpeed.textContent = this.#data.bomb2ShowPointSpeed + '%';
+    this.nutrientSolutionA.showPointBombSpeed.textContent = this.#data.HREG_BOMBA_0;
 
     this.nutrientSolutionB.showPointLevel.style.height = this.#data.nutrientSolutionBShowPointLevel + '%';
-    this.nutrientSolutionB.showPointBombState.classList.toggle('active', this.#data.bomb3State);
-    this.nutrientSolutionB.showPointBombSpeed.textContent = this.#data.bomb3ShowPointSpeed + '%';
+    this.nutrientSolutionB.showPointBombSpeed.textContent = this.#data.HREG_BOMBA_2;
+  }
+
+  #parse_ph(ph) {
+    return (-0.002273 * ph) + 13.431818
+  }
+
+  #parse_temp(temp) {
+    return 20 + ((temp - 1752) / 125)
+  }
+
+  /**
+   * @param {number} value 
+   * @param {number} a_min 
+   * @param {number} a_max 
+   * @param {number} b_min 
+   * @param {number} b_max 
+   */
+  #scale(value, a_min, a_max, b_min, b_max) {
+    if (value < a_min) value = a_min;
+    if (value > a_max) value = a_max;
+    let res = ((value - a_min) / (a_max - a_min)) * (b_max - b_min) + b_min;
+    return res || 0;
   }
 }

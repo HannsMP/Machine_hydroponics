@@ -1,11 +1,23 @@
 const mqtt = require("mqtt");
 
 /** @typedef {import('../types/types').DataResMQTT} DataResMQTT */
+/** @typedef {import('../types/types').DataReqMQTT} DataReqMQTT */
 
 class Mqtt {
-  url = 'mqtt://192.168.4.100'; /*'mqtt://test.mosquitto.org'*/
+  url = 'mqtt://192.168.200.100'; /*'mqtt://test.mosquitto.org'*/
+
+  /**
+   * @template {keyof DataReqMQTT} T
+   * @param {T} topic 
+   * @param {DataReqMQTT[T]} [data] 
+   */
+  publish(topic, data = "") {
+    this.client.publish(topic, String(data));
+  }
+
   /** @param {import('../app')} app */
   constructor(app) {
+    /** @type {MqttClientData} */
     this.client = mqtt.connect(this.url);
     this.app = app;
 
@@ -15,15 +27,9 @@ class Mqtt {
         ================== RES ==================
       */
       "control/RES_ALL_DATA": message => {
-        console.log(message);
-        
-        // let [MCS, MRS] = message.split(',')
-        // this.app.db.DATA.PROCESS.READY.MCS = Number(MCS);
-        // this.app.db.DATA.PROCESS.READY.MRS = Number(MRS);
-        // this.app.db.write();
-
-        // this.app.Socket.process_svr_ready();
-        // this.app.logger.log(`[res] termocupla lista`, 'danger');
+        this.app.db.DATA = { ...this.app.db.DATA, ...message };
+        this.app.db.write();
+        this.app.Socket.process_svr_update();
       }
     }
 
@@ -32,7 +38,7 @@ class Mqtt {
         this.client.subscribe(even, e => {
           if (e) throw e;
         })
-        
+
       this.eventos["__default__"] = () => { }
 
       this.client.on("message", (topic, message) => {
@@ -41,47 +47,80 @@ class Mqtt {
     })
 
   }
-  end() {
-    this.client.end()
+  REQ_COIL_LIGHT(data) {
+    this.publish("control/COIL_LIGHT",Math.floor(data));
   }
-  cortadora_state() {
-    let state = { '-2': 'detenido', '-1': 'pausa', '0': 'no iniciado', '1': 'iniciado' }
-    let data = String(this.app.db.DATA.PROCESS.STATE);
-    this.client.publish('cortadora/state', data);
-    this.app.logger.log(`[set] estado actualizado como: ${state[data]}`, 'success');
+  REQ_COIL_BOMBA_0(data) {
+    this.publish("control/COIL_BOMBA_0",Math.floor(data));
   }
-  /* 
-    ================== motores ==================
-  */
-  cortadora_motor_reqReady() {
-    this.client.publish('cortadora/motor/reqReady', "1");
-    this.app.logger.log(`[req] esperando motores`, 'success');
+  // REQ_COIL_BOMBA_1(data) {
+  //   this.publish("control/COIL_BOMBA_1",Math.floor(data));
+  // }
+  REQ_COIL_BOMBA_2(data) {
+    this.publish("control/COIL_BOMBA_2",Math.floor(data));
   }
-  cortadora_motor_length() {
-    let data = String(this.app.db.DATA.PROCESS.INPUT.LENGTH);
-    this.client.publish('cortadora/motor/length', data);
-    this.app.logger.log(`[set] Largo del corte: ${data} mm`, 'success');
+  REQ_COIL_BOMBA_3(data) {
+    this.publish("control/COIL_BOMBA_3",Math.floor(data));
   }
-  cortadora_motor_cuts() {
-    let data = String(this.app.db.DATA.PROCESS.INPUT.CUTS);
-    this.client.publish('cortadora/motor/cuts', data);
-    this.app.logger.log(`[set] Cantidad de cortes: ${data} unit`, 'success');
+  // REQ_HREG_BOMBA_0(data) {
+  //   this.publish("control/HREG_BOMBA_0",Math.floor(data));
+  // }
+  // REQ_HREG_BOMBA_1(data) {
+  //   this.publish("control/HREG_BOMBA_1",Math.floor(data));
+  // }
+  // REQ_HREG_BOMBA_2(data) {
+  //   this.publish("control/HREG_BOMBA_2",Math.floor(data));
+  // }
+  // REQ_HREG_BOMBA_3(data) {
+  //   this.publish("control/HREG_BOMBA_3",Math.floor(data));
+  // }
+  REQ_COIL_AIR_PUMP(data) {
+    this.publish("control/COIL_AIR_PUMP",Math.floor(data));
   }
-  cortadora_motor_start() {
-    this.client.publish('cortadora/motor/start', '1');
-    this.app.logger.log(`[set] iniciando motores`, 'success');
+  // REQ_HREG_LIGHT_PWM(data) {
+  //   this.publish("control/HREG_LIGHT_PWM",Math.floor(data));
+  // }
+  REQ_HREG_MODE(data) {
+    this.publish("control/HREG_MODE",Math.floor(data));
   }
-  /* 
-    ================== termocupla ==================
-  */
-  cortadora_termocupla_reqReady() {
-    this.client.publish('cortadora/termocupla/reqReady', "1");
-    this.app.logger.log(`[req] consultando termocupla`, 'success');
+  REQ_HREG_LUX_SP(data) {
+    this.publish("control/HREG_LUX_SP",Math.floor(data));
   }
-  cortadora_termocupla_temperatura() {
-    let data = String(this.app.db.DATA.PROCESS.FACTS.TEMPERATURE);
-    this.client.publish('cortadora/termocupla/temperatura', data);
-    this.app.logger.log(`[set] Temperatura: ${data} C°`, 'success');
+  REQ_HREG_AIR_ON_TIME(data) {
+    this.publish("control/HREG_AIR_ON_TIME",Math.floor(data));
+  }
+  REQ_HREG_AIR_OFF_TIME(data) {
+    this.publish("control/HREG_AIR_OFF_TIME",Math.floor(data));
+  }
+  REQ_HREG_B1_SP(data) {
+    this.publish("control/HREG_B1_SP",Math.floor(data));
+  }
+  REQ_HREG_B1_ON_TIME(data) {
+    this.publish("control/HREG_B1_ON_TIME",Math.floor(data));
+  }
+  REQ_HREG_B1_OFF_TIME(data) {
+    this.publish("control/HREG_B1_OFF_TIME",Math.floor(data));
+  }
+  REQ_HREG_B2_SP(data) {
+    this.publish("control/HREG_B2_SP",Math.floor(data));
+  }
+  REQ_HREG_B2_ON_TIME(data) {
+    this.publish("control/HREG_B2_ON_TIME",Math.floor(data));
+  }
+  REQ_HREG_B2_OFF_TIME(data) {
+    this.publish("control/HREG_B2_OFF_TIME",Math.floor(data));
+  }
+  REQ_HREG_B3_SP(data) {
+    this.publish("control/HREG_B3_SP",Math.floor(data));
+  }
+  REQ_HREG_B3_ON_TIME(data) {
+    this.publish("control/HREG_B3_ON_TIME",Math.floor(data));
+  }
+  REQ_HREG_B3_OFF_TIME(data) {
+    this.publish("control/HREG_B3_OFF_TIME",Math.floor(data));
+  }
+  REQ_ALL_DATA() {
+    this.publish("control/REQ_ALL_DATA");
   }
 }
 

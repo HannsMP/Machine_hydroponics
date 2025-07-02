@@ -10,32 +10,45 @@ class Jsoning {
     IREG_TDS_RAW: 0,
     IREG_PH_RAW: 0,
     IREG_TEMP_RAW: 0,
+
     IREG_LIGHT_LUX: 0,
+
     IREG_LSL: 0,
     IREG_LSH: 0,
+    STATUS_LIGHT: 0,
+    STATUS_AIR: 0,
+    STATUS_BOMBA_0: 0,
+    STATUS_BOMBA_1: 0,
+    STATUS_BOMBA_2: 0,
+    STATUS_BOMBA_3: 0,
+
+    COIL_LIGHT: 0,
     COIL_AIR_PUMP: 0,
-    HREG_LIGHT_PWM: 0,
-    HREG_MODE: 0,
-    HREG_LUX_SP: 0,
-    HREG_AIR_ON_TIME: 0,
-    HREG_AIR_OFF_TIME: 0,
     COIL_BOMBA_0: 0,
     COIL_BOMBA_1: 0,
     COIL_BOMBA_2: 0,
     COIL_BOMBA_3: 0,
+    HREG_MODE: 0,
+
+    HREG_LIGHT_PWM: 100,
     HREG_BOMBA_0: 0,
     HREG_BOMBA_1: 0,
     HREG_BOMBA_2: 0,
     HREG_BOMBA_3: 0,
-    HREG_B1_SP: 0,
-    HREG_B1_ON_TIME: 0,
-    HREG_B1_OFF_TIME: 0,
-    HREG_B2_SP: 0,
-    HREG_B2_ON_TIME: 0,
-    HREG_B2_OFF_TIME: 0,
-    HREG_B3_SP: 0,
-    HREG_B3_ON_TIME: 0,
-    HREG_B3_OFF_TIME: 0
+
+    HREG_LUX_SP: 100,
+    HREG_B1_SP: 500,
+    HREG_B2_SP: 500,
+    HREG_B3_SP: 500,
+    
+    HREG_AIR_ON_TIME: 180,
+    HREG_AIR_OFF_TIME: 3420,
+    HREG_B1_ON_TIME: 10,
+    HREG_B1_OFF_TIME: 300,
+    HREG_B2_ON_TIME: 10,
+    HREG_B2_OFF_TIME: 300,
+    HREG_B3_ON_TIME: 10,
+    HREG_B3_OFF_TIME: 300
   };
 
   constructor(path) {

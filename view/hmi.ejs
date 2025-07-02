@@ -23,7 +23,7 @@
             <span>PH: <span id="ph-value">7.0</span> pH</span>
           </div>
           <div class="info">
-            <span>EC: <span id="ec-value">2.0</span> uS/cm</span>
+            <span>EC: <span id="ec-value">2.0</span> mS/cm</span>
           </div>
           <div class="info">
             <span>TEMP: <span id="temp-value">25</span> C°</span>
@@ -53,7 +53,7 @@
         </div>
         <div class="data">
           <div class="info">
-            <span>LUX: <span id="luminaria-value">0</span></span>
+            <span>LUX: <span id="luminaria-value">0</span> lumenes</span>
           </div>
         </div>
       </div>
@@ -100,7 +100,7 @@
               <input type="number" id="luminaria-sp" value="70" min="0" max="100">
               <span>%</span>
             </div>
-            <div class="btn-save">
+            <div class="btn-save underline">
               <input type="button" id="guardar-luminaria-sp" value="SAVE">
             </div>
             <div class="btn-box">
@@ -126,7 +126,7 @@
               <input type="number" id="oxigenador-t-off" value="60" min="0">
               <span>seg</span>
             </div>
-            <div class="btn-save">
+            <div class="btn-save underline">
               <input type="button" id="guardar-oxigenador-t" value="SAVE">
             </div>
             <div class="btn-box">
@@ -157,7 +157,7 @@
               <input type="number" id="bomba-1-speed" value="100" min="0" max="100">
               <span>%</span>
             </div>
-            <div class="btn-save">
+            <div class="btn-save underline">
               <input type="button" id="guardar-bomba-1-speed" value="SAVE">
             </div>
             <div class="btn-box">
@@ -188,7 +188,7 @@
               <input type="number" id="bomba-2-speed" value="100" min="0" max="100">
               <span>%</span>
             </div>
-            <div class="btn-save">
+            <div class="btn-save underline">
               <input type="button" id="guardar-bomba-2-speed" value="SAVE">
             </div>
             <div class="btn-box">
@@ -219,13 +219,61 @@
               <input type="number" id="bomba-3-speed" value="100" min="0" max="100">
               <span>%</span>
             </div>
-            <div class="btn-save">
+            <div class="btn-save underline">
               <input type="button" id="guardar-bomba-3-speed" value="SAVE">
             </div>
             <div class="btn-box">
               <span>STATE:</span>
               <input type="button" id="bomba-3-on" value="ON">
               <input type="button" id="bomba-3-off" value="OFF">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- tanque de acido fosforico -->
+      <div class="hitbox" id="hitbox-6">
+        <div class="dashboard" style="display: none;">
+          <div class="form">
+            <div class="input-box">
+              <span>PH_SP:</span>
+              <input type="number" id="ph-sp" value="8" min="0" max="14">
+              <span>pH</span>
+            </div>
+            <div class="btn-save">
+              <input type="button" id="guardar-ph" value="SAVE">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- tanque de nutrientes a -->
+      <div class="hitbox" id="hitbox-7">
+        <div class="dashboard" style="display: none;">
+          <div class="form">
+            <div class="input-box">
+              <span>EC_SP:</span>
+              <input type="number" id="ec-a-sp" value="60" min="0">
+              <span>mS/cm</span>
+            </div>
+            <div class="btn-save">
+              <input type="button" id="guardar-ec-a" value="SAVE">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- tanque de nutrientes b -->
+      <div class="hitbox" id="hitbox-8">
+        <div class="dashboard" style="display: none;">
+          <div class="form">
+            <div class="input-box">
+              <span>EC_SP:</span>
+              <input type="number" id="ec-b-sp" value="60" min="0">
+              <span>mS/cm</span>
+            </div>
+            <div class="btn-save">
+              <input type="button" id="guardar-ec-b" value="SAVE">
             </div>
           </div>
         </div>
@@ -241,7 +289,8 @@
   <script src="/src/js/connection.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      window.hidroponia = new HidroponiaUI();
+      let data = JSON.parse(decodeURI("<%=encodeURI(JSON.stringify(data))%>"));
+      window.hidroponia = new HidroponiaUI(data);
     });
   </script>
 </body>

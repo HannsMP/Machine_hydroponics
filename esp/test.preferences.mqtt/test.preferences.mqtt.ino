@@ -1,24 +1,10 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
-#include "Adafruit_VEML7700.h"
 #include <PID_v1.h>
 #include <ArduinoJson.h>
 #include <Preferences.h>
 
 Preferences preferences;
-Adafruit_VEML7700 veml = Adafruit_VEML7700();
-
-// Pines
-const int LSL_PIN = 39;
-const int LSH_PIN = 36;
-const int EN[4]  = {19, 4, 26, 13};
-const int IN1[4] = {18, 17, 25, 14};
-const int IN2[4] = {5, 16, 33, 27};
-const int TDS_PIN = 34;
-const int PH_PIN = 35;
-const int TEMP_PIN = 32;
-const int PWM_LIGHT_PIN = 23;
-const int AIR_PUMP_PIN = 3;
 
 // Variables persistentes
 int STATUS_LIGHT, STATUS_AIR, STATUS_BOMBA_0, STATUS_BOMBA_1, STATUS_BOMBA_2, STATUS_BOMBA_3;
@@ -32,7 +18,7 @@ int HREG_B1_SP, HREG_B1_ON_TIME, HREG_B1_OFF_TIME;
 int HREG_B2_SP, HREG_B2_ON_TIME, HREG_B2_OFF_TIME;
 int HREG_B3_SP, HREG_B3_ON_TIME, HREG_B3_OFF_TIME;
 
-// Sensores
+// Sensores simulados
 int IREG_TDS_RAW, IREG_PH_RAW, IREG_TEMP_RAW;
 int IREG_LIGHT_LUX, IREG_LSL, IREG_LSH;
 
@@ -53,31 +39,17 @@ void setup() {
   preferences.begin("controller", false);
   loadPreferences();
 
-  WiFi.begin("ESP32_AP", "12345678");
+  WiFi.begin("REHF-2.4G", "tontosYtorpes291");
   while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
-
-  Serial.println("WiFi conectado. IP:");
+  Serial.println("\nWiFi conectado. IP:");
   Serial.println(WiFi.localIP());
 
-  client.setServer("192.168.4.100", 1883);
+  client.setServer("192.168.200.100", 1883);
   client.setCallback(callback);
-
-  Serial.println("MQTT conectado");
-
-  veml.begin();
-  veml.setLowThreshold(10000);
-  veml.setHighThreshold(20000);
-  veml.interruptEnable(true);
+  Serial.println("MQTT configurado.");
 
   LUX_PID.SetOutputLimits(0, 255);
   LUX_PID.SetMode(AUTOMATIC);
-
-  for (int i=0;i<4;i++) {
-    pinMode(EN[i], OUTPUT); pinMode(IN1[i], OUTPUT); pinMode(IN2[i], OUTPUT);
-  }
-  pinMode(AIR_PUMP_PIN, OUTPUT);
-  pinMode(LSL_PIN, INPUT);
-  pinMode(LSH_PIN, INPUT);
 }
 
 void loop() {
@@ -85,61 +57,39 @@ void loop() {
   client.loop();
 
   t_now = millis();
-  IREG_TDS_RAW = analogRead(TDS_PIN);
-  IREG_PH_RAW = analogRead(PH_PIN);
-  IREG_TEMP_RAW = analogRead(TEMP_PIN);
-  lux = veml.readLux();
+  
+  // Simulación de sensores en rangos típicos
+  IREG_TDS_RAW = random(200, 800); // ejemplo ppm crudos
+  IREG_PH_RAW = random(400, 600);  // ejemplo voltaje
+  IREG_TEMP_RAW = random(200, 400); // ejemplo 20-40°C *10
+  lux = random(0, 1000);
   IREG_LIGHT_LUX = (int)lux;
-  IREG_LSL = digitalRead(LSL_PIN);
-  IREG_LSH = digitalRead(LSH_PIN);
+  IREG_LSL = random(0,2); // 0 o 1
+  IREG_LSH = random(0,2);
 
   if ((HREG_MODE == 1) && (IREG_LSL==0)) controlAutomatico(IREG_TDS_RAW, IREG_PH_RAW);
   else controlManual();
 }
 
 void controlManual() {
-  int coilBomba[4] = {COIL_BOMBA_0, COIL_BOMBA_1, COIL_BOMBA_2, COIL_BOMBA_3};
-  int pwmBomba[4]  = {HREG_BOMBA_0, HREG_BOMBA_1, HREG_BOMBA_2, HREG_BOMBA_3};
-
-  for (int i=0;i<4;i++) {
-    if (coilBomba[i] && pwmBomba[i] > 0) {
-      analogWrite(EN[i], pwmBomba[i]);
-      digitalWrite(IN1[i], HIGH);
-      digitalWrite(IN2[i], LOW);
-    } else {
-      analogWrite(EN[i], 0);
-      digitalWrite(IN1[i], LOW);
-      digitalWrite(IN2[i], LOW);
-    }
-  }
-
-  STATUS_BOMBA_0 = (coilBomba[0] && pwmBomba[0] > 0) ? 1 : 0;
-  STATUS_BOMBA_1 = (coilBomba[1] && pwmBomba[1] > 0) ? 1 : 0;
-  STATUS_BOMBA_2 = (coilBomba[2] && pwmBomba[2] > 0) ? 1 : 0;
-  STATUS_BOMBA_3 = (coilBomba[3] && pwmBomba[3] > 0) ? 1 : 0;
+  STATUS_BOMBA_0 = COIL_BOMBA_0;
+  STATUS_BOMBA_1 = COIL_BOMBA_1;
+  STATUS_BOMBA_2 = COIL_BOMBA_2;
+  STATUS_BOMBA_3 = COIL_BOMBA_3;
 
   STATUS_AIR = COIL_AIR_PUMP ? 1 : 0;
-  STATUS_LIGHT = (HREG_LIGHT_PWM > 0) ? 1 : 0;
-
-  digitalWrite(AIR_PUMP_PIN, COIL_AIR_PUMP);
-
-  if (COIL_LIGHT)
-    analogWrite(PWM_LIGHT_PIN, HREG_LIGHT_PWM);
-  else
-    analogWrite(PWM_LIGHT_PIN, 0);
+  STATUS_LIGHT = (HREG_LIGHT_PWM > 0 && COIL_LIGHT) ? 1 : 0;
 }
 
 void controlAutomatico(int tds, int ph) {
   setpoint = HREG_LUX_SP;
   LUX_PID.Compute();
-  analogWrite(PWM_LIGHT_PIN, (int)pwmLight);
 
   if (air_state && (t_now - t_last_air >= HREG_AIR_ON_TIME*1000)) {
     air_state = false; t_last_air = t_now;
   } else if (!air_state && (t_now - t_last_air >= HREG_AIR_OFF_TIME*1000)) {
     air_state = true; t_last_air = t_now;
   }
-  digitalWrite(AIR_PUMP_PIN, air_state);
 
   int sp[3]={HREG_B1_SP,HREG_B2_SP,HREG_B3_SP};
   int on[3]={HREG_B1_ON_TIME*1000,HREG_B2_ON_TIME*1000,HREG_B3_ON_TIME*1000};
@@ -152,10 +102,6 @@ void controlAutomatico(int tds, int ph) {
     } else if (!bomba_state[i] && cond && (t_now - t_last_bomba[i] >= off[i])) {
       bomba_state[i]=true; t_last_bomba[i]=t_now;
     }
-    int pwm = bomba_state[i]?255:0;
-    analogWrite(EN[i], pwm);
-    digitalWrite(IN1[i], bomba_state[i]);
-    digitalWrite(IN2[i], LOW);
   }
 
   STATUS_LIGHT = ((int)pwmLight > 0) ? 1 : 0;
