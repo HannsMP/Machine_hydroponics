@@ -1,6 +1,6 @@
 /** @typedef {import('../../types/types').DataGlobal} DataGlobal */
 /** @typedef {import('../../types/types').DataEvent} DataEvent */
-/** @typedef {import('../../types/types').SoketData} SoketData */
+/** @typedef {import('../../types/types').SocketData} SocketData */
 
 class HidroponiaUI {
 
@@ -39,9 +39,9 @@ class HidroponiaUI {
     bomb3SetPointtimeOff: 0, // 0-inf
     bomb3State: 0, // 0-1
 
-    nutrientSolutionAShowPointLevel,
-    nutrientSolutionBShowPointLevel,
-    phosphoricAcidShowPointLevel
+    nutrientSolutionAShowPointLevel: 0,
+    nutrientSolutionBShowPointLevel: 0,
+    phosphoricAcidShowPointLevel: 0
   }
 
   #updateControl() {
@@ -94,7 +94,7 @@ class HidroponiaUI {
   constructor(data = {}) {
     this.#data = { ...this.#data, ...data };
 
-    /** @type {SoketData} */
+    /** @type {SocketData} */
     this.socket = io();
 
     this.luminary = {
@@ -122,6 +122,8 @@ class HidroponiaUI {
     this.phosphoricAcid = {
       showPointLevel: document.querySelector('#tanque-1 .nivel'),
       showPointBombState: document.getElementById('bomba-1'),
+      setPointTimeOn: document.getElementById('bomba-1-t-on'),
+      setPointTimeOff: document.getElementById('bomba-1-t-off'),
       setPointBombspeed: document.getElementById('bomba-1-speed'),
       showPointBombSpeed: document.getElementById('bomba-1-speed-value'),
       btnSave: document.getElementById('guardar-bomba-1-speed'),
@@ -134,6 +136,8 @@ class HidroponiaUI {
     this.nutrientSolutionA = {
       showPointLevel: document.querySelector('#tanque-2 .nivel'),
       showPointBombState: document.getElementById('bomba-2'),
+      setPointTimeOn: document.getElementById('bomba-2-t-on'),
+      setPointTimeOff: document.getElementById('bomba-2-t-off'),
       setPointBombspeed: document.getElementById('bomba-2-speed'),
       showPointBombSpeed: document.getElementById('bomba-2-speed-value'),
       btnSave: document.getElementById('guardar-bomba-2-speed'),
@@ -146,6 +150,8 @@ class HidroponiaUI {
     this.nutrientSolutionB = {
       showPointLevel: document.querySelector('#tanque-3 .nivel'),
       showPointBombState: document.getElementById('bomba-3'),
+      setPointTimeOn: document.getElementById('bomba-3-t-on'),
+      setPointTimeOff: document.getElementById('bomba-3-t-off'),
       setPointBombspeed: document.getElementById('bomba-3-speed'),
       showPointBombSpeed: document.getElementById('bomba-3-speed-value'),
       btnSave: document.getElementById('guardar-bomba-3-speed'),
@@ -248,52 +254,48 @@ class HidroponiaUI {
     })
 
     this.phosphoricAcid.btnSave.addEventListener("click", () => {
+      let t_on = parseInt(this.phosphoricAcid.setPointTimeOn.value);
+      let t_off = parseInt(this.phosphoricAcid.setPointTimeOff.value);
       let speed = parseInt(this.phosphoricAcid.setPointBombspeed.value);
       this.#data.bomb1SetPointSpeed = speed;
-      this.socket.emit('phosphoricAcid-config', { speed });
+      this.socket.emit('phosphoricAcid-config', { t_on, t_off, speed });
     })
 
     this.nutrientSolutionA.btnSave.addEventListener("click", () => {
+      let t_on = parseInt(this.nutrientSolutionA.setPointTimeOn.value);
+      let t_off = parseInt(this.nutrientSolutionA.setPointTimeOff.value);
       let speed = parseInt(this.nutrientSolutionA.setPointBombspeed.value);
       this.#data.bomb2SetPointSpeed = speed;
-      this.socket.emit('nutrientSolutionA-config', { speed });
+      this.socket.emit('nutrientSolutionA-config', { t_on, t_off, speed });
     })
 
     this.nutrientSolutionB.btnSave.addEventListener("click", () => {
+      let t_on = parseInt(this.nutrientSolutionB.setPointTimeOn.value);
+      let t_off = parseInt(this.nutrientSolutionB.setPointTimeOff.value);
       let speed = parseInt(this.nutrientSolutionB.setPointBombspeed.value);
       this.#data.bomb3SetPointSpeed = speed;
-      this.socket.emit('nutrientSolutionB-config', { speed });
+      this.socket.emit('nutrientSolutionB-config', { t_on, t_off, speed });
     })
 
     /* click on */
 
     this.luminary.btnOn.addEventListener("click", () => {
-      // this.#data.luminaryState = 1;
-      // this.#updateBtnHitbox1();
       this.socket.emit('luminary-state', { state: 1 });
     });
 
     this.oxygenator.btnOn.addEventListener("click", () => {
-      // this.#data.oxygenatorState = 1;
-      // this.#updateBtnHitbox2();
       this.socket.emit('oxygenator-state', { state: 1 });
     });
 
     this.phosphoricAcid.btnOn.addEventListener("click", () => {
-      // this.#data.bomb1State = 1;
-      // this.#updateBtnHitbox3();
       this.socket.emit('phosphoricAcid-state', { state: 1 });
     });
 
     this.nutrientSolutionA.btnOn.addEventListener("click", () => {
-      // this.#data.bomb2State = 1;
-      // this.#updateBtnHitbox4();
       this.socket.emit('nutrientSolutionA-state', { state: 1 });
     });
 
     this.nutrientSolutionB.btnOn.addEventListener("click", () => {
-      // this.#data.bomb3State = 1;
-      // this.#updateBtnHitbox5();
       this.socket.emit('nutrientSolutionB-state', { state: 1 });
     });
 
@@ -331,7 +333,7 @@ class HidroponiaUI {
   }
 
   setupSocket() {
-    this.socket.on('update-data', data => {
+    this.socket.on('/update-data', data => {
       this.#data.luminaryState = 0;
       this.#updateBtnHitbox1();
       this.#data.oxygenatorState = 0;

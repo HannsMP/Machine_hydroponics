@@ -22,10 +22,16 @@ const int AIR_PUMP_PIN = 3;
 
 // Variables persistentes
 int COIL_AIR_PUMP;
-int COIL_BOMBA[4];
+int COIL_BOMBA_0;
+int COIL_BOMBA_1;
+int COIL_BOMBA_2;
+int COIL_BOMBA_3;
 
 int HREG_LIGHT_PWM;
-int HREG_BOMBA[4];
+int HREG_BOMBA_0;
+int HREG_BOMBA_1;
+int HREG_BOMBA_2;
+int HREG_BOMBA_3; // 0-255
 int HREG_MODE;
 int HREG_LUX_SP;
 int HREG_AIR_ON_TIME, HREG_AIR_OFF_TIME;
@@ -55,20 +61,17 @@ void setup() {
   preferences.begin("controller", false);
   loadPreferences();
 
-  WiFi.begin("REHF-2.4G", "tontosYtorpes291");
-  while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
-  Serial.println("\nWiFi conectado. IP:"); Serial.println(WiFi.localIP());
+  WiFi.begin("ESP32_AP", "12345678");
+  while (WiFi.status() != WL_CONNECTED) { 
+    delay(500); Serial.print("."); 
+  }
+  Serial.println("WiFi conectado. IP:");
+  Serial.println(WiFi.localIP());
 
   client.setServer("192.168.4.4", 1883);
   client.setCallback(callback);
-  while (!client.connected()) {
-    if (client.connect("ESP32Controller")) {
-      client.subscribe("controller/#");
-      client.subscribe("controller/get_state");
-    } else { delay(500); }
-  }
 
-  if (!veml.begin()) { while (1); }
+  veml.begin();
   veml.setLowThreshold(10000);
   veml.setHighThreshold(20000);
   veml.interruptEnable(true);
@@ -77,7 +80,9 @@ void setup() {
   LUX_PID.SetMode(AUTOMATIC);
 
   for (int i=0;i<4;i++) {
-    pinMode(EN[i], OUTPUT); pinMode(IN1[i], OUTPUT); pinMode(IN2[i], OUTPUT);
+    pinMode(EN[i], OUTPUT); 
+    pinMode(IN1[i], OUTPUT); 
+    pinMode(IN2[i], OUTPUT);
   }
   pinMode(AIR_PUMP_PIN, OUTPUT);
   pinMode(LSL_PIN, INPUT);
@@ -85,7 +90,9 @@ void setup() {
 }
 
 void loop() {
+  if (!client.connected()) reconnect();
   client.loop();
+
   t_now = millis();
 
   IREG_TDS_RAW = analogRead(TDS_PIN);
@@ -96,8 +103,10 @@ void loop() {
   IREG_LSL = digitalRead(LSL_PIN);
   IREG_LSH = digitalRead(LSH_PIN);
 
-  if ((HREG_MODE == 1) && (IREG_LSL==0)) controlAutomatico(IREG_TDS_RAW, IREG_PH_RAW);
-  else controlManual();
+  if ((HREG_MODE == 1) && (IREG_LSL==0)) 
+    controlAutomatico(IREG_TDS_RAW, IREG_PH_RAW);
+  else 
+    controlManual();
 }
 
 // CONTROL MANUAL
@@ -178,7 +187,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
     HREG_AIR_OFF_TIME = msg.toInt();
     preferences.putInt("HREG_AIR_OFF_TIME", HREG_AIR_OFF_TIME); 
   }
-
   else if (t == "controller/HREG_B1_SP") { 
     HREG_B1_SP = msg.toInt();
     preferences.putInt("HREG_B1_SP", HREG_B1_SP); 
@@ -232,6 +240,31 @@ void callback(char* topic, byte* payload, unsigned int length) {
     char out[512]; serializeJson(doc, out);
     
     client.publish("controller/state", out);
+  }
+}
+
+void reconnect() {
+  while (!client.connected()) {
+    if (client.connect("ESP32_Client")) {
+      client.subscribe("controller/COIL_AIR_PUMP");
+      client.subscribe("controller/HREG_LIGHT_PWM");
+      client.subscribe("controller/HREG_MODE");
+      client.subscribe("controller/HREG_LUX_SP");
+      client.subscribe("controller/HREG_AIR_ON_TIME");
+      client.subscribe("controller/HREG_AIR_OFF_TIME");
+      client.subscribe("controller/HREG_B1_SP");
+      client.subscribe("controller/HREG_B1_ON_TIME");
+      client.subscribe("controller/HREG_B1_OFF_TIME");
+      client.subscribe("controller/HREG_B2_SP");
+      client.subscribe("controller/HREG_B2_ON_TIME");
+      client.subscribe("controller/HREG_B2_OFF_TIME");
+      client.subscribe("controller/HREG_B3_SP");
+      client.subscribe("controller/HREG_B3_ON_TIME");
+      client.subscribe("controller/HREG_B3_OFF_TIME");
+      client.subscribe("controller/get_state");
+    } else {
+      delay(5000);
+    }
   }
 }
 
