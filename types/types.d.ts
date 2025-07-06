@@ -125,8 +125,7 @@ type DataClient = {
 
 type control_config = { mode: 0 | 1 }
 type luminary_config = { sp: 0 | 100 }
-type ph_config = { sp: 0 | 14 }
-type ec_config = { sp: number }
+type hydroponic_config = { stPh: number, stEc: number }
 
 type oxygenator_config = { timeOn: number, timeOff: number }
 type phosphoricAcid_config = { timeOn: number, timeOff: number, speed: 0 | 100 }
@@ -148,8 +147,7 @@ type DataEvent = {
   "phosphoricAcid-config": (data: phosphoricAcid_config) => void
   "nutrientSolutionA-config": (data: nutrientSolutionA_config) => void
   "nutrientSolutionB-config": (data: nutrientSolutionB_config) => void
-  "tankPH-config": (data: ph_config) => void
-  "tankEC-config": (data: ec_config) => void
+  "hydroponic-config": (data:hydroponic_config) => void
 
   "luminary-state": (data: luminary_state) => void
   "oxygenator-state": (data: oxygenator_state) => void

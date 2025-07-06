@@ -14,9 +14,11 @@ class HidroponiaUI {
     STATUS_LIGHT: 0,
     STATUS_AIR: 0,
     STATUS_BOMBA_0: 0, // 0-1
+    STATUS_BOMBA_1: 0,
     STATUS_BOMBA_2: 0, // 0-1
     STATUS_BOMBA_3: 0, // 0-1
     HREG_BOMBA_0: 0, // 0-100
+    HREG_BOMBA_1: 0,
     HREG_BOMBA_2: 0, // 0-100
     HREG_BOMBA_3: 0, // 0-100
     nutrientSolutionAShowPointLevel: 70, // 0-100
@@ -27,6 +29,7 @@ class HidroponiaUI {
     COIL_LIGHT: 0, // 0-1
     COIL_AIR_PUMP: 0, // 0-1
     COIL_BOMBA_0: 0, // 0-1
+    COIL_BOMBA_1: 0,
     COIL_BOMBA_2: 0, // 0-1
     COIL_BOMBA_3: 0, // 0-1
 
@@ -39,6 +42,8 @@ class HidroponiaUI {
     HREG_B1_SP: 0, // 0-100
     HREG_B2_SP: 0, // 0-100
     HREG_B3_SP: 0, // 0-100
+    HREG_PH_SP: 0, //0-14
+    HREG_EC_SP: 0, //0-2000
 
     HREG_B1_ON_TIME: 0, // 0-inf
     HREG_B1_OFF_TIME: 0, // 0-inf
@@ -172,32 +177,16 @@ class HidroponiaUI {
       dashboard: document.querySelector('#hitbox-5 .dashboard')
     }
 
-    this.tankPH = {
-      setPointPH: document.getElementById('ph-sp'),
-      btnSave: document.getElementById('guardar-ph'),
-      hitbox: document.getElementById('hitbox-6'),
-      dashboard: document.querySelector('#hitbox-6 .dashboard')
-    }
-
-    this.tankECA = {
-      setPointEC: document.getElementById('ec-a-sp'),
-      btnSave: document.getElementById('guardar-ec-a'),
-      hitbox: document.getElementById('hitbox-7'),
-      dashboard: document.querySelector('#hitbox-7 .dashboard')
-    }
-
-    this.tankECB = {
-      setPointEC: document.getElementById('ec-b-sp'),
-      btnSave: document.getElementById('guardar-ec-b'),
-      hitbox: document.getElementById('hitbox-8'),
-      dashboard: document.querySelector('#hitbox-8 .dashboard')
-    }
-
     this.hydroponicTank = {
-      showPintEC: document.getElementById('ec-value'),
+      setPointPH: document.getElementById('ph-sp'),
+      setPointEC: document.getElementById('ec-sp'),
       showPointPH: document.getElementById('ph-value'),
+      showPintEC: document.getElementById('ec-value'),
       showPointLevel: document.querySelector('#tanque-0 .nivel'),
       showPointTEMP: document.getElementById('temp-value'),
+      btnSave: document.getElementById('guardar-tanque-hidroponico'),
+      hitbox: document.getElementById('hitbox-6'),
+      dashboard: document.querySelector('#hitbox-6 .dashboard')
     }
 
     this.btnControlManual = document.getElementById('control-manual');
@@ -209,9 +198,7 @@ class HidroponiaUI {
       this.phosphoricAcid,
       this.nutrientSolutionA,
       this.nutrientSolutionB,
-      this.tankECA,
-      this.tankECB,
-      this.tankPH
+      this.hydroponicTank
     ];
 
     this.updateInterface();
@@ -306,14 +293,10 @@ class HidroponiaUI {
       this.socket.emit('nutrientSolutionB-config', { timeOn, timeOff, speed });
     })
 
-    this.tankPH.btnSave.addEventListener("click", () => {
-      let sp = parseInt(this.tankPH.setPointPH.value);
-      this.socket.emit('tankPH-config', { sp });
-    })
-
-    this.tankECA.btnSave.addEventListener("click", () => {
-      let sp = parseInt(this.tankECA.setPointEC.value);
-      this.socket.emit('tankECA-config', { sp });
+    this.hydroponicTank.btnSave.addEventListener("click", () => {
+      let stPh = parseInt(this.hydroponicTank.setPointPH.value);
+      let stEc = parseInt(this.hydroponicTank.setPointEC.value);
+      this.socket.emit('hydroponic-config', { stPh, stEc });
     })
 
     /* click on */
@@ -355,7 +338,6 @@ class HidroponiaUI {
     this.nutrientSolutionB.btnOff.addEventListener("click", () => {
       this.socket.emit('nutrientSolutionB-state', { state: 0 });
     });
-
   }
 
   /**

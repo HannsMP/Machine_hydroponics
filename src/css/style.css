@@ -286,32 +286,12 @@ body {
     }
 
     #hitbox-6 {
-        top: 28%;
-        left: 83%;
+        top: 67%;
+        left: 6%;
 
         .dashboard {
             top: -3%;
-            left: -105%;
-        }
-    }
-
-    #hitbox-7 {
-        top: 50%;
-        left: 83%;
-
-        .dashboard {
-            top: -1%;
-            left: -105%;
-        }
-    }
-
-    #hitbox-8 {
-        top: 72%;
-        left: 83%;
-
-        .dashboard {
-            top: -1%;
-            left: -105%;
+            left: 105%;
         }
     }
 
