@@ -1,225 +1,178 @@
 import { Socket, Server } from "socket.io";
 
-type DataController = {
-  "IREG_TDS_RAW": 0 | 4095
-  "IREG_PH_RAW": 0 | 4095
-  "IREG_TEMP_RAW": 0 | 4095
+type Int = number;
+type Int_1 = 0 | 1;
+type Int_8 = 0 | 255;
+type Int_12 = 0 | 4095;
+type Int_16 = 0 | 65535;
 
-  "IREG_LIGHT_LUX": 0 | 65535
+type Percentage = 0 | 100;
 
-  "IREG_LSL": 0 | 1
-  "IREG_LSH": 0 | 1
-  "STATUS_LIGHT": 0 | 1
-  "STATUS_AIR": 0 | 1
-  "STATUS_BOMBA_0": 0 | 1
-  "STATUS_BOMBA_1": 0 | 1
-  "STATUS_BOMBA_2": 0 | 1
-  "STATUS_BOMBA_3": 0 | 1
+type DataConfig = {
+  "HREG_MODE": Int_1;
 
-  "COIL_LIGHT": 0 | 1
-  "COIL_AIR_PUMP": 0 | 1
-  "COIL_BOMBA_0": 0 | 1
-  "COIL_BOMBA_1": 0 | 1
-  "COIL_BOMBA_2": 0 | 1
-  "COIL_BOMBA_3": 0 | 1
-  "HREG_MODE": 0 | 1
+  "COIL_LUX": Int_1;
+  "COIL_AIR_PUMP": Int_1;
 
-  "HREG_LIGHT_PWM": 0 | 255
-  "HREG_BOMBA_0": 0 | 255
-  "HREG_BOMBA_1": 0 | 255
-  "HREG_BOMBA_2": 0 | 255
-  "HREG_BOMBA_3": 0 | 255
+  "HREG_LUX_PWM": Int_8;
+  "HREG_LUX_SP": Int_16;
+  "HREG_ON_MS_AIR": Int;
+  "HREG_OFF_MS_AIR": Int;
 
-  "HREG_LUX_SP": 0 | 65535
-  "HREG_B1_SP": 0 | 65535
-  "HREG_B2_SP": 0 | 65535
-  "HREG_B3_SP": 0 | 65535
+  "COIL_PUMP_0": Int_1
+  "COIL_PUMP_1": Int_1
+  "COIL_PUMP_2": Int_1
 
-  "HREG_AIR_ON_TIME": number
-  "HREG_AIR_OFF_TIME": number
-  "HREG_B1_ON_TIME": number
-  "HREG_B1_OFF_TIME": number
-  "HREG_B2_ON_TIME": number
-  "HREG_B2_OFF_TIME": number
-  "HREG_B3_ON_TIME": number
-  "HREG_B3_OFF_TIME": number
+  "HREG_DOPING_SP_0": Int_12
+  "HREG_DOPING_SP_1": Int_12
+  "HREG_DOPING_SP_2": Int_12
+
+  "HREG_PUMP_0": Int_8
+  "HREG_PUMP_1": Int_8
+  "HREG_PUMP_2": Int_8
+
+  "HREG_ON_MS_PUMP_0": Int;
+  "HREG_ON_MS_PUMP_1": Int;
+  "HREG_ON_MS_PUMP_2": Int;
+
+  "HREG_OFF_MS_PUMP_0": Int;
+  "HREG_OFF_MS_PUMP_1": Int;
+  "HREG_OFF_MS_PUMP_2": Int;
 }
 
-type DataReqMQTT = {
-  "control/COIL_LIGHT": 0 | 1
-  "control/COIL_AIR_PUMP": 0 | 1
-  "control/COIL_BOMBA_0": 0 | 1
-  "control/COIL_BOMBA_1": 0 | 1
-  "control/COIL_BOMBA_2": 0 | 1
-  "control/COIL_BOMBA_3": 0 | 1
-  "control/HREG_MODE": 0 | 1
+type DataStream = {
+  "IREG_LSL": Int_1;
+  "IREG_LSH": Int_1;
 
-  "control/HREG_LIGHT_PWM": 0 | 255
-  "control/HREG_BOMBA_0": 0 | 255
-  "control/HREG_BOMBA_1": 0 | 255
-  "control/HREG_BOMBA_2": 0 | 255
-  "control/HREG_BOMBA_3": 0 | 255
+  "IREG_TDS_RAW": Int_12;
+  "IREG_PH_RAW": Int_12;
+  "IREG_TEMP_RAW": Int_12;
 
-  "control/HREG_LUX_SP": 0 | 65535
-  "control/HREG_B1_SP": 0 | 65535
-  "control/HREG_B2_SP": 0 | 65535
-  "control/HREG_B3_SP": 0 | 65535
+  "IREG_LUX": Int_16;
+  "PWM_LUX": Int_8;
 
-  "control/HREG_AIR_ON_TIME": number
-  "control/HREG_AIR_OFF_TIME": number
-  "control/HREG_B1_ON_TIME": number
-  "control/HREG_B1_OFF_TIME": number
-  "control/HREG_B2_ON_TIME": number
-  "control/HREG_B2_OFF_TIME": number
-  "control/HREG_B3_ON_TIME": number
-  "control/HREG_B3_OFF_TIME": number
+  "STATUS_LUX": Int_1;
+  "STATUS_AIR": Int_1;
 
-  "control/REQ_ALL_DATA": null
+  "STATUS_PUMP_0": Int_1;
+  "STATUS_PUMP_1": Int_1;
+  "STATUS_PUMP_2": Int_1;
+
+  "LAST_MS_AIR": Int;
+  "LAST_MS_PUMP_0": Int;
+  "LAST_MS_PUMP_1": Int;
+  "LAST_MS_PUMP_2": Int;
+
+  "CURRENT_TIME": Int;
 }
 
-type DataResMQTT = {
-  "control/RES_ALL_DATA": DataController
+type DataController = DataConfig & DataStream;
+
+type DataSetMQTT = {
+  "control/REQ_DATA_STREAM": undefined
+
+  "control/HREG_MODE": Int_1;
+
+  "control/COIL_LUX": Int_1;
+  "control/COIL_AIR_PUMP": Int_1;
+
+  "control/HREG_LUX_PWM": Int_8;
+  "control/HREG_LUX_SP": Int_16;
+  "control/HREG_ON_MS_AIR": Int;
+  "control/HREG_OFF_MS_AIR": Int;
+
+  "control/COIL_PUMP_0": Int_1
+  "control/COIL_PUMP_1": Int_1
+  "control/COIL_PUMP_2": Int_1
+
+  "control/HREG_DOPING_SP_0": Int_12
+  "control/HREG_DOPING_SP_1": Int_12
+  "control/HREG_DOPING_SP_2": Int_12
+
+  "control/HREG_PUMP_0": Int_8
+  "control/HREG_PUMP_1": Int_8
+  "control/HREG_PUMP_2": Int_8
+
+  "control/HREG_ON_MS_PUMP_0": Int;
+  "control/HREG_ON_MS_PUMP_1": Int;
+  "control/HREG_ON_MS_PUMP_2": Int;
+
+  "control/HREG_OFF_MS_PUMP_0": Int;
+  "control/HREG_OFF_MS_PUMP_1": Int;
+  "control/HREG_OFF_MS_PUMP_2": Int;
 }
 
-type DataClient = {
-  "IREG_TDS_RAW": 0 | 4095
-  "IREG_PH_RAW": 0 | 4095
-  "IREG_TEMP_RAW": 0 | 4095
-  "IREG_LIGHT_LUX": 0 | 65535
-  "IREG_LSL": 0 | 1
-  "IREG_LSH": 0 | 1
-  "STATUS_LIGHT": 0 | 1
-  "STATUS_AIR": 0 | 1
-  "STATUS_BOMBA_0": 0 | 1
-  "STATUS_BOMBA_1": 0 | 1
-  "STATUS_BOMBA_2": 0 | 1
-  "STATUS_BOMBA_3": 0 | 1
-  "HREG_BOMBA_0": 0 | 100
-  "HREG_BOMBA_1": 0 | 100
-  "HREG_BOMBA_2": 0 | 100
-  "HREG_BOMBA_3": 0 | 100
-
-  "HREG_MODE": 0 | 1
-  "COIL_LIGHT": 0 | 1
-  "COIL_AIR_PUMP": 0 | 1
-  "COIL_BOMBA_0": 0 | 1
-  "COIL_BOMBA_1": 0 | 1
-  "COIL_BOMBA_2": 0 | 1
-  "COIL_BOMBA_3": 0 | 1
-  "HREG_LIGHT_PWM": 0 | 100
-  "HREG_LUX_SP": 0 | 100
-  "HREG_B1_SP": 0 | 100
-  "HREG_B2_SP": 0 | 100
-  "HREG_B3_SP": 0 | 100
-  "HREG_PH_SP": 0 | 14
-  "HREG_EC_SP": number
-  "HREG_AIR_ON_TIME": number
-  "HREG_AIR_OFF_TIME": number
-  "HREG_B1_ON_TIME": number
-  "HREG_B1_OFF_TIME": number
-  "HREG_B2_ON_TIME": number
-  "HREG_B2_OFF_TIME": number
-  "HREG_B3_ON_TIME": number
-  "HREG_B3_OFF_TIME": number
+type DataGetMQTT = {
+  "control/REFRESH_DATA_STREAM": DataStream;
+  "control/REFRESH_DATA_CONFIG": DataConfig;
 }
 
-type control_config = { mode: 0 | 1 }
-type luminary_config = { sp: 0 | 100 }
-type hydroponic_config = { stPh: number, stEc: number }
+type cnfg_mode = { mode: Int_1 };
+type cnfg_lux = { setpoint: Percentage };
+type cnfg_doping = { doping_0: Int, doping_1: Int, doping_2: Int };
 
-type oxygenator_config = { timeOn: number, timeOff: number }
-type phosphoricAcid_config = { timeOn: number, timeOff: number, speed: 0 | 100 }
-type nutrientSolutionA_config = { timeOn: number, timeOff: number, speed: 0 | 100 }
-type nutrientSolutionB_config = { timeOn: number, timeOff: number, speed: 0 | 100 }
+type cnfg_air = { on_s: Int, off_s: Int };
+type cnfg_pump_0 = { on_s: Int, off_s: Int, setpoint: Percentage };
+type cnfg_pump_1 = { on_s: Int, off_s: Int, setpoint: Percentage };
+type cnfg_pump_2 = { on_s: Int, off_s: Int, setpoint: Percentage };
 
-type luminary_state = { state: 1 | 0 }
-type oxygenator_state = { state: 1 | 0 }
-type phosphoricAcid_state = { state: 1 | 0 }
-type nutrientSolutionA_state = { state: 1 | 0 }
-type nutrientSolutionB_state = { state: 1 | 0 }
-
-type update_data = DataController
+type state_lux = Int_1;
+type state_air = Int_1;
+type state_pump_0 = Int_1;
+type state_pump_1 = Int_1;
+type state_pump_2 = Int_1;
 
 type DataEvent = {
-  "control-config": (data: control_config) => void
-  "luminary-config": (data: luminary_config) => void
-  "oxygenator-config": (data: oxygenator_config) => void
-  "phosphoricAcid-config": (data: phosphoricAcid_config) => void
-  "nutrientSolutionA-config": (data: nutrientSolutionA_config) => void
-  "nutrientSolutionB-config": (data: nutrientSolutionB_config) => void
-  "hydroponic-config": (data:hydroponic_config) => void
+  "/cnfg_mode": (cnfg: cnfg_mode) => void;
+  "/cnfg_lux": (cnfg: cnfg_lux) => void;
+  "/cnfg_doping": (cnfg: cnfg_doping) => void;
+  "/cnfg_air": (cnfg: cnfg_air) => void;
+  "/cnfg_pump_0": (cnfg: cnfg_pump_0) => void;
+  "/cnfg_pump_1": (cnfg: cnfg_pump_1) => void;
+  "/cnfg_pump_2": (cnfg: cnfg_pump_2) => void;
 
-  "luminary-state": (data: luminary_state) => void
-  "oxygenator-state": (data: oxygenator_state) => void
-  "phosphoricAcid-state": (data: phosphoricAcid_state) => void
-  "nutrientSolutionA-state": (data: nutrientSolutionA_state) => void
-  "nutrientSolutionB-state": (data: nutrientSolutionB_state) => void
+  "/state_lux": (state: state_lux) => void;
+  "/state_air": (state: state_air) => void;
+  "/state_pump_0": (state: state_pump_0) => void;
+  "/state_pump_1": (state: state_pump_1) => void;
+  "/state_pump_2": (state: state_pump_2) => void;
 
-  "/update-data": (data: update_data) => void
+  "update_stream": (data: DataStream) => void;
+  "update_config": (data: DataConfig) => void;
 }
 
 type SocketData = Socket<DataEvent>;
 type ServerSocketData = Server<SocketData>;
 
 export {
-  DataClient,
-  DataEvent,
-  DataController,
-  DataReqMQTT,
-  DataResMQTT,
+  Int,
+  Int_1,
+  Int_8,
+  Int_12,
+  Int_16,
+  Percentage,
 
-  control_config,
-  luminary_config,
-  oxygenator_config,
-  phosphoricAcid_config,
-  nutrientSolutionA_config,
-  nutrientSolutionB_config,
-  ph_config,
-  ec_config,
-  luminary_state,
-  oxygenator_state,
-  phosphoricAcid_state,
-  nutrientSolutionA_state,
-  nutrientSolutionB_state,
-  update_data,
+  DataConfig,
+  DataStream,
+  DataController,
+  DataSetMQTT,
+  DataGetMQTT,
+
+  cnfg_mode,
+  cnfg_lux,
+  cnfg_doping,
+  cnfg_air,
+  cnfg_pump_0,
+  cnfg_pump_1,
+  cnfg_pump_2,
+  state_lux,
+  state_air,
+  state_pump_0,
+  state_pump_1,
+  state_pump_2,
+
+  DataEvent,
 
   SocketData,
   ServerSocketData
 }
-
-
-/* 
-
-{
-  IREG_TDS_RAW: 0,
-  IREG_PH_RAW: 34,
-  IREG_TEMP_RAW: 2266,
-  IREG_LIGHT_LUX: 43,
-  IREG_LSL: 0,
-  IREG_LSH: 0,
-  COIL_AIR_PUMP: 0,
-  HREG_LIGHT_PWM: 100,
-  HREG_MODE: 0,
-  HREG_LUX_SP: 100,
-  HREG_AIR_ON_TIME: 180,
-  HREG_AIR_OFF_TIME: 3420,
-  COIL_BOMBA_0: 0,
-  COIL_BOMBA_1: 0,
-  COIL_BOMBA_2: 0,
-  COIL_BOMBA_3: 0,
-  HREG_BOMBA_0: 0,
-  HREG_BOMBA_1: 0,
-  HREG_BOMBA_2: 0,
-  HREG_BOMBA_3: 0,
-  HREG_B1_SP: 500,
-  HREG_B1_ON_TIME: 10,
-  HREG_B1_OFF_TIME: 300,
-  HREG_B2_SP: 500,
-  HREG_B2_ON_TIME: 10,
-  HREG_B2_OFF_TIME: 300,
-  HREG_B3_SP: 500,
-  HREG_B3_ON_TIME: 10,
-  HREG_B3_OFF_TIME: 300
-}
-
-*/

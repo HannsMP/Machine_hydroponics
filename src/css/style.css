@@ -203,11 +203,17 @@ body {
         top: 25%;
         left: 25%;
         border: 4px dashed transparent;
+        display: none;
+    }
+
+    .hitbox .dashboard {
+        display: none;
     }
 
     .hitbox.active {
         background-color: rgba(0, 0, 0, .05);
         cursor: pointer;
+        display: flex !important;
     }
 
     .hitbox.active:hover,
@@ -217,10 +223,6 @@ body {
 
     .hitbox.active.show .dashboard {
         display: flex !important;
-    }
-
-    .hitbox .dashboard {
-        display: none;
     }
 
     .dashboard {

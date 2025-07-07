@@ -7,7 +7,7 @@ const Jsoning = require('./controllers/jsoning');
 const Socket = require('./controllers/Socket');
 const Mqtt = require('./controllers/Mqtt');
 const Logger = require('./controllers/Logger');
-const { networkInterfaces, type } = require('os');
+const { networkInterfaces } = require('os');
 
 class App {
   app = express();
@@ -15,22 +15,19 @@ class App {
 
   logger = new Logger(resolve('logger.log'), this);
 
-  db = new Jsoning(resolve('data.json'));
+  db = new Jsoning(resolve('data/data.json'));
   Socket = new Socket(this);
   mqtt = new Mqtt(this);
   constructor() {
-
     this.app.set('view engine', 'ejs');
-
     this.app.use('/src', express.static(resolve('src')));
-
     // this.app.use('/', morgan(':method :status :response-time ms - :url'));
 
     /* ruta inicial */
     this.app.get('/', (req, res) => {
-      res.render(resolve('view', 'hmi.ejs'), {
-        data: this.db.DATA
-      })
+      res
+        .status(200)
+        .render(resolve('view', 'hmi.ejs'), { data: this.db.DATA });
     })
 
     this.start();
@@ -39,7 +36,7 @@ class App {
 
   start() {
     setInterval(() => {
-      this.mqtt.REQ_ALL_DATA();
+      this.mqtt.REQ_DATA_STREAM();
     }, 1000);
   }
 
@@ -49,15 +46,8 @@ class App {
       this.server.listen(port, (err) => {
         if (err)
           return rej(err);
-        try {
-          let net = networkInterfaces();
-          this.ip = (
-            net["Ethernet"] || net["Ethernet 3"] || net["Wi-Fi"] || net['Ethernet 5']
-          )[1].address;
-        } catch (error) {
-
-        }
-        console.log(`[App] http://${this.ip}:${port}`);
+        this.net = this.getIPAddress();
+        console.log(`[App] http://${this.net.ipv4 || 'localhost'}:${port}`);
         res();
       })
     })
@@ -75,6 +65,31 @@ class App {
     if (value > a_max) value = a_max;
     let res = ((value - a_min) / (a_max - a_min)) * (b_max - b_min) + b_min;
     return res || 0;
+  }
+
+  /**
+ * @returns {{ ipv4?: string, ipv6?: string, internal?: string }}
+ */
+  getIPAddress() {
+    const nets = networkInterfaces();
+    const result = {};
+
+    for (const name of Object.keys(nets)) {
+      for (const net of nets[name]) {
+        if (net.family === 'IPv4' && !net.internal)
+          result.ipv4 = net.address;
+        else if (net.family === 'IPv4' && net.internal)
+          result.internal = net.address;
+        else if (net.family === 'IPv6' && !net.internal)
+          result.ipv6 = net.address;
+
+        if (result.ipv4 && result.ipv6 && result.internal) break;
+      }
+
+      if (result.ipv4 && result.ipv6 && result.internal) break;
+    }
+
+    return result;
   }
 }
 

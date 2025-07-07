@@ -1,18 +1,36 @@
 const mqtt = require("mqtt");
 
-/** @typedef {import('../types/types').DataResMQTT} DataResMQTT */
-/** @typedef {import('../types/types').DataReqMQTT} DataReqMQTT */
+/** @typedef {import('../types/types').Int} Int */
+/** @typedef {import('../types/types').Int_1} Int_1 */
+/** @typedef {import('../types/types').Int_8} Int_8 */
+/** @typedef {import('../types/types').Int_12} Int_12 */
+/** @typedef {import('../types/types').Int_16} Int_16 */
+/** @typedef {import('../types/types').Percentage} Percentage */
+
+/** @typedef {import('../types/types').DataGetMQTT} DataGetMQTT */
+/** @typedef {import('../types/types').DataSetMQTT} DataSetMQTT */
 
 class Mqtt {
-  url = 'mqtt://192.168.4.100'; /*'mqtt://test.mosquitto.org'*/
+  url = 'mqtt://192.168.200.100'; /*'mqtt://test.mosquitto.org'*/
 
   /**
-   * @template {keyof DataReqMQTT} T
+   * @template {keyof DataSetMQTT} T
    * @param {T} topic 
-   * @param {DataReqMQTT[T]} [data] 
+   * @param {DataSetMQTT[T]} [value] 
    */
-  publish(topic, data = "") {
-    this.client.publish(topic, String(data));
+  #publish(topic, value = 0) {
+    if (typeof value == 'number' && value != NaN)
+      this.client.publish(topic, String(value));
+  }
+
+  /**
+   * @param {number} val 
+   * @param {number} min 
+   * @param {number} max 
+   */
+  #intRange(val, min, max) {
+    let value = Math.floor(+val);
+    return Math.min(Math.max(value, min), max);
   }
 
   /** @param {import('../app')} app */
@@ -21,19 +39,26 @@ class Mqtt {
     this.client = mqtt.connect(this.url);
     this.app = app;
 
-    /** @type {{[k in keyof DataResMQTT]: (data: DataResMQTT[k])=>void}} */
+    /** @type {{[k in keyof DataGetMQTT]: (value: DataGetMQTT[k])=>void}} */
     this.eventos = {
       /* 
         ================== RES ==================
       */
-      "control/RES_ALL_DATA": message => {
-        this.app.db.DATA = { ...this.app.db.DATA, ...message };
+      "control/REFRESH_DATA_CONFIG": data => {
+        this.app.db.DATA.CONFIG = data;
         this.app.db.write();
-        this.app.Socket.process_svr_update();
+        this.app.Socket.process_svr_config();
+      },
+      "control/REFRESH_DATA_STREAM": data => {
+        this.app.db.DATA.STREAM = data;
+        this.app.db.write();
+        this.app.Socket.process_svr_stream();
       }
     }
 
     this.client.on('connect', () => {
+      console.log(`[MQTT] conectado ${this.url}`);
+
       for (let even in this.eventos)
         this.client.subscribe(even, e => {
           if (e) throw e;
@@ -47,80 +72,114 @@ class Mqtt {
     })
 
   }
-  REQ_COIL_LIGHT(data) {
-    this.publish("control/COIL_LIGHT",Math.floor(data));
+  /* 
+    ==========================================
+    ================= getter =================
+    ==========================================
+  */
+  REQ_DATA_STREAM() {
+    this.#publish("control/REQ_DATA_STREAM");
   }
-  REQ_COIL_BOMBA_0(data) {
-    this.publish("control/COIL_BOMBA_0",Math.floor(data));
+
+  /* 
+    ==========================================
+    ================= Setter =================
+    ==========================================
+  */
+  /** @param {Int_1} value  */
+  REQ_HREG_MODE(value) {
+    this.#publish("control/HREG_MODE", value ? 1 : 0);
   }
-  // REQ_COIL_BOMBA_1(data) {
-  //   this.publish("control/COIL_BOMBA_1",Math.floor(data));
-  // }
-  REQ_COIL_BOMBA_2(data) {
-    this.publish("control/COIL_BOMBA_2",Math.floor(data));
+
+  /** @param {Int_1} value  */
+  COIL_LUX(value) {
+    this.#publish("control/COIL_LUX", value ? 1 : 0);
   }
-  REQ_COIL_BOMBA_3(data) {
-    this.publish("control/COIL_BOMBA_3",Math.floor(data));
+  /** @param {Int_1} value  */
+  REQ_COIL_AIR_PUMP(value) {
+    this.#publish("control/COIL_AIR_PUMP", value ? 1 : 0);
   }
-  // REQ_HREG_BOMBA_0(data) {
-  //   this.publish("control/HREG_BOMBA_0",Math.floor(data));
-  // }
-  // REQ_HREG_BOMBA_1(data) {
-  //   this.publish("control/HREG_BOMBA_1",Math.floor(data));
-  // }
-  // REQ_HREG_BOMBA_2(data) {
-  //   this.publish("control/HREG_BOMBA_2",Math.floor(data));
-  // }
-  // REQ_HREG_BOMBA_3(data) {
-  //   this.publish("control/HREG_BOMBA_3",Math.floor(data));
-  // }
-  REQ_COIL_AIR_PUMP(data) {
-    this.publish("control/COIL_AIR_PUMP",Math.floor(data));
+
+  /** @param {Int_8} value  */
+  HREG_LUX_PWM(value) {
+    this.#publish("control/HREG_LUX_PWM", this.#intRange(value, 0, 255));
   }
-  // REQ_HREG_LIGHT_PWM(data) {
-  //   this.publish("control/HREG_LIGHT_PWM",Math.floor(data));
-  // }
-  REQ_HREG_MODE(data) {
-    this.publish("control/HREG_MODE",Math.floor(data));
+  /** @param {Int_16} value  */
+  HREG_LUX_SP(value) {
+    this.#publish("control/HREG_LUX_SP", this.#intRange(value, 0, 65535));
   }
-  REQ_HREG_LUX_SP(data) {
-    this.publish("control/HREG_LUX_SP",Math.floor(data));
+  /** @param {Int} value  */
+  HREG_ON_MS_AIR(value) {
+    this.#publish("control/HREG_ON_MS_AIR", Math.floor(value));
   }
-  REQ_HREG_AIR_ON_TIME(data) {
-    this.publish("control/HREG_AIR_ON_TIME",Math.floor(data));
+  /** @param {Int} value  */
+  HREG_OFF_MS_AIR(value) {
+    this.#publish("control/HREG_OFF_MS_AIR", Math.floor(value));
   }
-  REQ_HREG_AIR_OFF_TIME(data) {
-    this.publish("control/HREG_AIR_OFF_TIME",Math.floor(data));
+
+  /** @param {Int_1} value  */
+  COIL_PUMP_0(value) {
+    this.#publish("control/COIL_PUMP_0", value ? 1 : 0);
   }
-  REQ_HREG_B1_SP(data) {
-    this.publish("control/HREG_B1_SP",Math.floor(data));
+  /** @param {Int_1} value  */
+  COIL_PUMP_1(value) {
+    this.#publish("control/COIL_PUMP_1", value ? 1 : 0);
   }
-  REQ_HREG_B1_ON_TIME(data) {
-    this.publish("control/HREG_B1_ON_TIME",Math.floor(data));
+  /** @param {Int_1} value  */
+  COIL_PUMP_2(value) {
+    this.#publish("control/COIL_PUMP_2", value ? 1 : 0);
   }
-  REQ_HREG_B1_OFF_TIME(data) {
-    this.publish("control/HREG_B1_OFF_TIME",Math.floor(data));
+
+  /** @param {Int_12} value  */
+  HREG_DOPING_SP_0(value) {
+    this.#publish("control/HREG_DOPING_SP_0", this.#intRange(value, 0, 4095));
   }
-  REQ_HREG_B2_SP(data) {
-    this.publish("control/HREG_B2_SP",Math.floor(data));
+  /** @param {Int_12} value  */
+  HREG_DOPING_SP_1(value) {
+    this.#publish("control/HREG_DOPING_SP_1", this.#intRange(value, 0, 4095));
   }
-  REQ_HREG_B2_ON_TIME(data) {
-    this.publish("control/HREG_B2_ON_TIME",Math.floor(data));
+  /** @param {Int_12} value  */
+  HREG_DOPING_SP_2(value) {
+    this.#publish("control/HREG_DOPING_SP_2", this.#intRange(value, 0, 4095));
   }
-  REQ_HREG_B2_OFF_TIME(data) {
-    this.publish("control/HREG_B2_OFF_TIME",Math.floor(data));
+
+  /** @param {Int_8} value  */
+  HREG_PUMP_0(value) {
+    this.#publish("control/HREG_PUMP_0", this.#intRange(value, 0, 255));
   }
-  REQ_HREG_B3_SP(data) {
-    this.publish("control/HREG_B3_SP",Math.floor(data));
+  /** @param {Int_8} value  */
+  HREG_PUMP_1(value) {
+    this.#publish("control/HREG_PUMP_1", this.#intRange(value, 0, 255));
   }
-  REQ_HREG_B3_ON_TIME(data) {
-    this.publish("control/HREG_B3_ON_TIME",Math.floor(data));
+  /** @param {Int_8} value  */
+  HREG_PUMP_2(value) {
+    this.#publish("control/HREG_PUMP_2", this.#intRange(value, 0, 255));
   }
-  REQ_HREG_B3_OFF_TIME(data) {
-    this.publish("control/HREG_B3_OFF_TIME",Math.floor(data));
+
+  /** @param {Int} value  */
+  HREG_ON_MS_PUMP_0(value) {
+    this.#publish("control/HREG_ON_MS_PUMP_0", Math.floor(value));
   }
-  REQ_ALL_DATA() {
-    this.publish("control/REQ_ALL_DATA");
+  /** @param {Int} value  */
+  HREG_ON_MS_PUMP_1(value) {
+    this.#publish("control/HREG_ON_MS_PUMP_1", Math.floor(value));
+  }
+  /** @param {Int} value  */
+  HREG_ON_MS_PUMP_2(value) {
+    this.#publish("control/HREG_ON_MS_PUMP_2", Math.floor(value));
+  }
+
+  /** @param {Int} value  */
+  HREG_OFF_MS_PUMP_0(value) {
+    this.#publish("control/HREG_OFF_MS_PUMP_0", Math.floor(value));
+  }
+  /** @param {Int} value  */
+  HREG_OFF_MS_PUMP_1(value) {
+    this.#publish("control/HREG_OFF_MS_PUMP_1", Math.floor(value));
+  }
+  /** @param {Int} value  */
+  HREG_OFF_MS_PUMP_2(value) {
+    this.#publish("control/HREG_OFF_MS_PUMP_2", Math.floor(value));
   }
 }
 

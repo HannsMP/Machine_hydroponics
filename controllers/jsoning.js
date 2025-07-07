@@ -1,54 +1,45 @@
 const { readFileSync, writeFileSync, existsSync } = require("fs");
 
-/** @typedef {import('../types/types').DataController} DataController */
+/** @typedef {import('../types/types').DataConfig} DataConfig */
+/** @typedef {import('../types/types').DataStream} DataStream */
 
 class Jsoning {
   #path;
 
-  /** @type {DataController} */
+  /** @type {{CONFIG: DataConfig, STREAM: DataStream}} */
   DATA = {
-    IREG_TDS_RAW: 0,
-    IREG_PH_RAW: 0,
-    IREG_TEMP_RAW: 0,
+    CONFIG: {
+      "HREG_MODE": 0,
 
-    IREG_LIGHT_LUX: 0,
+      "COIL_LUX": 0,
+      "COIL_AIR_PUMP": 0,
 
-    IREG_LSL: 0,
-    IREG_LSH: 0,
-    STATUS_LIGHT: 0,
-    STATUS_AIR: 0,
-    STATUS_BOMBA_0: 0,
-    STATUS_BOMBA_1: 0,
-    STATUS_BOMBA_2: 0,
-    STATUS_BOMBA_3: 0,
+      "HREG_LUX_PWM": 0,
+      "HREG_LUX_SP": 100,
+      "HREG_ON_MS_AIR": 180,
+      "HREG_OFF_MS_AIR": 3420,
 
-    COIL_LIGHT: 0,
-    COIL_AIR_PUMP: 0,
-    COIL_BOMBA_0: 0,
-    COIL_BOMBA_1: 0,
-    COIL_BOMBA_2: 0,
-    COIL_BOMBA_3: 0,
-    HREG_MODE: 0,
+      "COIL_PUMP_0": 0,
+      "COIL_PUMP_1": 0,
+      "COIL_PUMP_2": 0,
 
-    HREG_LIGHT_PWM: 100,
-    HREG_BOMBA_0: 0,
-    HREG_BOMBA_1: 0,
-    HREG_BOMBA_2: 0,
-    HREG_BOMBA_3: 0,
+      "HREG_DOPING_SP_0": 500,
+      "HREG_DOPING_SP_1": 500,
+      "HREG_DOPING_SP_2": 500,
 
-    HREG_LUX_SP: 100,
-    HREG_B1_SP: 500,
-    HREG_B2_SP: 500,
-    HREG_B3_SP: 500,
-    
-    HREG_AIR_ON_TIME: 180,
-    HREG_AIR_OFF_TIME: 3420,
-    HREG_B1_ON_TIME: 10,
-    HREG_B1_OFF_TIME: 300,
-    HREG_B2_ON_TIME: 10,
-    HREG_B2_OFF_TIME: 300,
-    HREG_B3_ON_TIME: 10,
-    HREG_B3_OFF_TIME: 300
+      "HREG_PUMP_0": 0,
+      "HREG_PUMP_1": 0,
+      "HREG_PUMP_2": 0,
+
+      "HREG_ON_MS_PUMP_0": 10,
+      "HREG_ON_MS_PUMP_1": 10,
+      "HREG_ON_MS_PUMP_2": 10,
+
+      "HREG_OFF_MS_PUMP_0": 300,
+      "HREG_OFF_MS_PUMP_1": 300,
+      "HREG_OFF_MS_PUMP_2": 300,
+    },
+    STREAM: {}
   };
 
   constructor(path) {

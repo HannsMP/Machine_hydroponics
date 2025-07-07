@@ -1,19 +1,19 @@
 /** @typedef {import('../types/types').ServerSocketData} ServerSocketData */
 
-/** @typedef {import('../types/types').control_config} control_config */
-/** @typedef {import('../types/types').luminary_config} luminary_config */
-/** @typedef {import('../types/types').oxygenator_config} oxygenator_config */
-/** @typedef {import('../types/types').phosphoricAcid_config} phosphoricAcid_config */
-/** @typedef {import('../types/types').nutrientSolutionA_config} nutrientSolutionA_config */
-/** @typedef {import('../types/types').nutrientSolutionB_config} nutrientSolutionB_config */
-/** @typedef {import('../types/types').ph_config} ph_config */
-/** @typedef {import('../types/types').ec_config} ec_config */
-/** @typedef {import('../types/types').luminary_state} luminary_state */
-/** @typedef {import('../types/types').oxygenator_state} oxygenator_state */
-/** @typedef {import('../types/types').phosphoricAcid_state} phosphoricAcid_state */
-/** @typedef {import('../types/types').nutrientSolutionA_state} nutrientSolutionA_state */
-/** @typedef {import('../types/types').nutrientSolutionB_state} nutrientSolutionB_state */
-/** @typedef {import('../types/types').update_data} update_data */
+/** @typedef {import('../types/types').cnfg_mode} cnfg_mode */
+/** @typedef {import('../types/types').cnfg_lux} cnfg_lux */
+/** @typedef {import('../types/types').cnfg_doping} cnfg_doping */
+
+/** @typedef {import('../types/types').cnfg_air} cnfg_air */
+/** @typedef {import('../types/types').cnfg_pump_0} cnfg_pump_0 */
+/** @typedef {import('../types/types').cnfg_pump_1} cnfg_pump_1 */
+/** @typedef {import('../types/types').cnfg_pump_2} cnfg_pump_2 */
+
+/** @typedef {import('../types/types').state_lux} state_lux */
+/** @typedef {import('../types/types').state_air} state_air */
+/** @typedef {import('../types/types').state_pump_0} state_pump_0 */
+/** @typedef {import('../types/types').state_pump_1} state_pump_1 */
+/** @typedef {import('../types/types').state_pump_2} state_pump_2 */
 
 const { Server } = require('socket.io');
 
@@ -26,120 +26,126 @@ class Socket {
     this.io = new Server(this.app.server);
 
     this.io.on('connection', (socket) => {
-      console.log('usuario conectado');
+      // console.log('usuario conectado');
 
-      socket.on('control-config', d => this.control_config(d));
-      socket.on('luminary-config', d => this.luminary_config(d));
-      socket.on('oxygenator-config', d => this.oxygenator_config(d));
-      socket.on('phosphoricAcid-config', d => this.phosphoricAcid_config(d));
-      socket.on('nutrientSolutionA-config', d => this.nutrientSolutionA_config(d));
-      socket.on('nutrientSolutionB-config', d => this.nutrientSolutionB_config(d));
-      socket.on('tankPH-config', d => this.tankPH_config(d));
-      socket.on('tankEC-config', d => this.tankEC_config(d));
-      socket.on('luminary-state', d => this.luminary_state(d));
-      socket.on('oxygenator-state', d => this.oxygenator_state(d));
-      socket.on('phosphoricAcid-state', d => this.phosphoricAcid_state(d));
-      socket.on('nutrientSolutionA-state', d => this.nutrientSolutionA_state(d));
-      socket.on('nutrientSolutionB-state', d => this.nutrientSolutionB_state(d));
+      socket.on('/cnfg_mode', d => this.cnfg_mode(d));
+      socket.on('/cnfg_lux', d => this.cnfg_lux(d));
+      socket.on('/cnfg_doping', d => this.cnfg_doping(d));
+      socket.on('/cnfg_air', d => this.cnfg_air(d));
+      socket.on('/cnfg_pump_0', d => this.cnfg_pump_0(d));
+      socket.on('/cnfg_pump_1', d => this.cnfg_pump_1(d));
+      socket.on('/cnfg_pump_2', d => this.cnfg_pump_2(d));
+
+      socket.on('/state_lux', d => this.state_lux(d));
+      socket.on('/state_air', d => this.state_air(d));
+      socket.on('/state_pump_0', d => this.state_pump_0(d));
+      socket.on('/state_pump_1', d => this.state_pump_1(d));
+      socket.on('/state_pump_2', d => this.state_pump_2(d));
+
+      socket.on('update_config', r => r(this.app.db.DATA.CONFIG));
     });
-  }
-  /** @param {control_config} data */
-  control_config(data) {
-    let { mode } = data;
-    if (mode == 1)
-      this.app.mqtt.REQ_HREG_MODE(1);
-    if (mode == 0)
-      this.app.mqtt.REQ_HREG_MODE(0);
-
-  }
-  /** @param {luminary_config} data */
-  luminary_config(data) {
-    let { sp } = data;
-    let scale = this.app.scale(sp, 0, 100, 0, 65535);
-
-    this.app.mqtt.REQ_HREG_LUX_SP(scale);
-  }
-  /** @param {oxygenator_config} data */
-  oxygenator_config(data) {
-    let { timeOn, timeOff } = data;
-
-    this.app.mqtt.REQ_HREG_AIR_ON_TIME(timeOn);
-    this.app.mqtt.REQ_HREG_AIR_OFF_TIME(timeOff);
-  }
-  /** @param {phosphoricAcid_config} data */
-  phosphoricAcid_config(data) {
-    let { timeOn, timeOff, speed } = data;
-
-    this.app.mqtt.REQ_HREG_B1_ON_TIME(timeOn);
-    this.app.mqtt.REQ_HREG_B1_OFF_TIME(timeOff);
-
-    let scale = this.app.scale(speed, 0, 100, 0, 255);
-
-    this.app.mqtt.REQ_HREG_B1_SP(scale);
-  }
-  /** @param {nutrientSolutionA_config} data */
-  nutrientSolutionA_config(data) {
-    let { timeOn, timeOff, speed } = data;
-
-    this.app.mqtt.REQ_HREG_B2_ON_TIME(timeOn);
-    this.app.mqtt.REQ_HREG_B2_OFF_TIME(timeOff);
-
-    let scale = this.app.scale(speed, 0, 100, 0, 255);
-
-    this.app.mqtt.REQ_HREG_B2_SP(scale);
-  }
-  /** @param {nutrientSolutionB_config} data */
-  nutrientSolutionB_config(data) {
-    let { timeOn, timeOff, speed } = data;
-
-    this.app.mqtt.REQ_HREG_B3_ON_TIME(timeOn);
-    this.app.mqtt.REQ_HREG_B3_OFF_TIME(timeOff);
-
-    let scale = this.app.scale(speed, 0, 100, 0, 255);
-
-    this.app.mqtt.REQ_HREG_B3_SP(scale);
-  }
-  /** @param {ph_config} data */
-  tankPH_config(data) {
-
-  }
-  /** @param {ec_config} data */
-  tankEC_config(data) {
-
-  }
-  /** @param {luminary_state} data */
-  luminary_state(data) {
-    let { state } = data;
-
-    this.app.mqtt.REQ_COIL_LIGHT(state == 1 ? 1 : 0)
-  }
-  /** @param {oxygenator_state} data */
-  oxygenator_state(data) {
-    let { state } = data;
-    this.app.mqtt.REQ_COIL_AIR_PUMP(state == 1 ? 1 : 0);
-  }
-  /** @param {phosphoricAcid_state} data */
-  phosphoricAcid_state(data) {
-    let { state } = data;
-    this.app.mqtt.REQ_COIL_BOMBA_3(state == 1 ? 1 : 0);
-  }
-  /** @param {nutrientSolutionA_state} data */
-  nutrientSolutionA_state(data) {
-    let { state } = data;
-    this.app.mqtt.REQ_COIL_BOMBA_0(state == 1 ? 1 : 0);
-  }
-  /** @param {nutrientSolutionB_state} data */
-  nutrientSolutionB_state(data) {
-    let { state } = data;
-    this.app.mqtt.REQ_COIL_BOMBA_2(state == 1 ? 1 : 0);
   }
   /* 
     ==========================================
-    ================= server =================
+    ================= getter =================
     ==========================================
   */
-  process_svr_update() {
-    this.io.emit('/update-data', this.app.db.DATA);
+  process_svr_config() {
+    this.io.emit('update_config', this.app.db.DATA.CONFIG);
+  }
+  process_svr_stream() {
+    this.io.emit('update_stream', this.app.db.DATA.STREAM);
+  }
+  /* 
+    ==========================================
+    ================= Setter =================
+    ==========================================
+  */
+  /* ========== FORM ========== */
+  /** @param {cnfg_mode} data */
+  cnfg_mode(data) {
+    let { mode } = data;
+
+    this.app.mqtt.REQ_HREG_MODE(mode);
+  }
+  /** @param {cnfg_lux} data */
+  cnfg_lux(data) {
+    let { setpoint } = data;
+
+    let scale_8 = this.app.scale(setpoint, 0, 100, 0, 255);
+    let scale_16 = this.app.scale(setpoint, 0, 100, 0, 65535);
+
+    this.app.mqtt.HREG_LUX_PWM(scale_8);
+    this.app.mqtt.HREG_LUX_SP(scale_16);
+  }
+  /** @param {cnfg_air} data */
+  cnfg_air(data) {
+    let { on_s, off_s } = data;
+
+    this.app.mqtt.HREG_ON_MS_AIR(on_s);
+    this.app.mqtt.HREG_OFF_MS_AIR(off_s);
+  }
+  /** @param {cnfg_doping} data */
+  cnfg_doping(data) {
+    let { doping_0, doping_1, doping_2 } = data;
+
+    let scale_ph = this.app.scale(doping_0, 0, 14, 0, 4095);
+
+    this.app.mqtt.HREG_DOPING_SP_0(scale_ph);
+    this.app.mqtt.HREG_DOPING_SP_1(doping_1);
+    this.app.mqtt.HREG_DOPING_SP_2(doping_2);
+  }
+  /** @param {cnfg_pump_0} data */
+  cnfg_pump_0(data) {
+    let { on_s, off_s, setpoint } = data;
+
+    let scale_8 = this.app.scale(setpoint, 0, 100, 0, 255);
+
+    this.app.mqtt.HREG_ON_MS_PUMP_0(on_s);
+    this.app.mqtt.HREG_OFF_MS_PUMP_0(off_s);
+    this.app.mqtt.HREG_PUMP_0(scale_8);
+  }
+  /** @param {cnfg_pump_1} data */
+  cnfg_pump_1(data) {
+    let { on_s, off_s, setpoint } = data;
+
+    let scale_8 = this.app.scale(setpoint, 0, 100, 0, 255);
+
+    this.app.mqtt.HREG_ON_MS_PUMP_1(on_s);
+    this.app.mqtt.HREG_OFF_MS_PUMP_1(off_s);
+    this.app.mqtt.HREG_PUMP_1(scale_8);
+  }
+  /** @param {cnfg_pump_2} data */
+  cnfg_pump_2(data) {
+    let { on_s, off_s, setpoint } = data;
+
+    let scale_8 = this.app.scale(setpoint, 0, 100, 0, 255);
+
+    this.app.mqtt.HREG_ON_MS_PUMP_2(on_s);
+    this.app.mqtt.HREG_OFF_MS_PUMP_2(off_s);
+    this.app.mqtt.HREG_PUMP_2(scale_8);
+  }
+
+  /* ========== STATE ========== */
+  /** @param {state_lux} state */
+  state_lux(state) {
+    this.app.mqtt.COIL_LUX(state);
+  }
+  /** @param {state_air} state */
+  state_air(state) {
+    this.app.mqtt.REQ_COIL_AIR_PUMP(state);
+  }
+  /** @param {state_pump_0} state */
+  state_pump_0(state) {
+    this.app.mqtt.COIL_PUMP_0(state);
+  }
+  /** @param {state_pump_1} state */
+  state_pump_1(state) {
+    this.app.mqtt.COIL_PUMP_1(state);
+  }
+  /** @param {state_pump_2} state */
+  state_pump_2(state) {
+    this.app.mqtt.COIL_PUMP_2(state);
   }
 }
 
