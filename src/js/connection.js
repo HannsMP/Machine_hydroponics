@@ -3,7 +3,20 @@
 /** @typedef {import('../../types/types').DataEvent} DataEvent */
 /** @typedef {import('../../types/types').SocketData} SocketData */
 
+/** @typedef {import('../../types/types').cnfg_lux} cnfg_lux */
+/** @typedef {import('../../types/types').cnfg_doping} cnfg_doping */
+/** @typedef {import('../../types/types').cnfg_air} cnfg_air */
+/** @typedef {import('../../types/types').cnfg_pump_0} cnfg_pump_0 */
+/** @typedef {import('../../types/types').cnfg_pump_1} cnfg_pump_1 */
+/** @typedef {import('../../types/types').cnfg_pump_2} cnfg_pump_2 */
+
 class HidroponiaUI {
+
+  /** @param {number} val */
+  #intRange(val, min = 0, max = 0) {
+    let value = Math.floor(+val);
+    return Math.min(Math.max(value, min), max);
+  }
 
   /** @param {number} ph */
   #parse_ph(ph) {
@@ -387,7 +400,7 @@ class HidroponiaUI {
     this.socket.on('update_config', data => this.#refreshConfig(data));
 
     this.socket.emit('update_config', data => this.#refreshConfig(data));
-    this.#refreshConfig(data);
+    this.#refreshConfig(this.#dataConfig);
   }
 
   /** @param {DataStream} data  */
@@ -430,9 +443,8 @@ class HidroponiaUI {
       HREG_OFF_MS_PUMP_2
     } = this.#dataConfig;
 
-
     if (HREG_LUX_SP !== data.HREG_LUX_SP)
-      this.lux.setPoint.value = this.#scale(data.HREG_LUX_SP, 0, 65535, 0, 100).toFixed(2);
+      this.lux.setPoint.value = Math.floor(this.#scale(data.HREG_LUX_SP, 0, 65535, 0, 100));
 
     // AIR-T-ON
     if (HREG_ON_MS_AIR !== data.HREG_ON_MS_AIR)
@@ -446,7 +458,7 @@ class HidroponiaUI {
       this.doping.setPointPH.value = this.#parse_ph(data.HREG_DOPING_SP_0).toFixed(2);
     // EC-SP
     if (HREG_DOPING_SP_1 !== data.HREG_DOPING_SP_1)
-      this.doping.setPointEC.value = data.HREG_DOPING_SP_1.toFixed(2);
+      this.doping.setPointEC.value = Math.floor(data.HREG_DOPING_SP_1);
 
     // PUMP-1-SPEED
     if (HREG_PUMP_0 !== data.HREG_PUMP_0)
@@ -477,10 +489,10 @@ class HidroponiaUI {
     // PUMP-3-T-OFF
     if (HREG_OFF_MS_PUMP_2 !== data.HREG_OFF_MS_PUMP_2)
       this.pump_2.setPointTimeOff.value = Math.floor(data.HREG_OFF_MS_PUMP_2 / 1000);
-    
-    this.pump_0.showPointBombSpeed.textContent = data.HREG_PUMP_0.toFixed(2);
-    this.pump_1.showPointBombSpeed.textContent = data.HREG_PUMP_1.toFixed(2);
-    this.pump_2.showPointBombSpeed.textContent = data.HREG_PUMP_2.toFixed(2);
+
+    this.pump_0.showPointBombSpeed.textContent = Math.floor(this.#scale(data.HREG_PUMP_0, 0, 255, 0, 100));
+    this.pump_1.showPointBombSpeed.textContent = Math.floor(this.#scale(data.HREG_PUMP_1, 0, 255, 0, 100));
+    this.pump_2.showPointBombSpeed.textContent = Math.floor(this.#scale(data.HREG_PUMP_2, 0, 255, 0, 100));
 
     this.#dataConfig = data;
     this.#updateInterface();
