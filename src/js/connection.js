@@ -387,6 +387,7 @@ class HidroponiaUI {
     this.socket.on('update_config', data => this.#refreshConfig(data));
 
     this.socket.emit('update_config', data => this.#refreshConfig(data));
+    this.#refreshConfig(data);
   }
 
   /** @param {DataStream} data  */
@@ -400,16 +401,11 @@ class HidroponiaUI {
     this.doping.showPointTEMP.textContent = this.#parse_temp(data.IREG_TEMP_RAW).toFixed(2);
 
     this.lux.showPointFocus.style.boxShadow = `0 0 30px ${this.#scale(data.IREG_LUX, 0, 65535, 5, 20)}px #fff783`;
-    this.lux.showPointIntensity.textContent = data.IREG_LUX;
+    this.lux.showPointIntensity.textContent = data.IREG_LUX.toFixed(2);
 
     this.pump_0.showPointLevel.style.height = data.IREG_DOPING_LEVEL_0 + '%';
-    this.pump_0.showPointBombSpeed.textContent = data.HREG_BOMBA_0;
-
     this.pump_1.showPointLevel.style.height = data.IREG_DOPING_LEVEL_1 + '%';
-    this.pump_1.showPointBombSpeed.textContent = data.HREG_BOMBA_1;
-
     this.pump_2.showPointLevel.style.height = data.IREG_DOPING_LEVEL_2 + '%';
-    this.pump_2.showPointBombSpeed.textContent = data.HREG_BOMBA_2;
 
     this.#updateInterface();
   }
@@ -436,7 +432,7 @@ class HidroponiaUI {
 
 
     if (HREG_LUX_SP !== data.HREG_LUX_SP)
-      this.lux.setPoint.value = this.#scale(data.HREG_LUX_SP, 0, 65535, 0, 100);
+      this.lux.setPoint.value = this.#scale(data.HREG_LUX_SP, 0, 65535, 0, 100).toFixed(2);
 
     // AIR-T-ON
     if (HREG_ON_MS_AIR !== data.HREG_ON_MS_AIR)
@@ -446,7 +442,7 @@ class HidroponiaUI {
       this.air.setPointTimeOff.value = Math.floor(data.HREG_OFF_MS_AIR / 1000);
 
     // PH-SP
-    if (HREG_DOPING_SP_0 !== data.HREG_DOPING_SP_0)      
+    if (HREG_DOPING_SP_0 !== data.HREG_DOPING_SP_0)
       this.doping.setPointPH.value = this.#parse_ph(data.HREG_DOPING_SP_0).toFixed(2);
     // EC-SP
     if (HREG_DOPING_SP_1 !== data.HREG_DOPING_SP_1)
@@ -481,6 +477,10 @@ class HidroponiaUI {
     // PUMP-3-T-OFF
     if (HREG_OFF_MS_PUMP_2 !== data.HREG_OFF_MS_PUMP_2)
       this.pump_2.setPointTimeOff.value = Math.floor(data.HREG_OFF_MS_PUMP_2 / 1000);
+    
+    this.pump_0.showPointBombSpeed.textContent = data.HREG_PUMP_0.toFixed(2);
+    this.pump_1.showPointBombSpeed.textContent = data.HREG_PUMP_1.toFixed(2);
+    this.pump_2.showPointBombSpeed.textContent = data.HREG_PUMP_2.toFixed(2);
 
     this.#dataConfig = data;
     this.#updateInterface();
