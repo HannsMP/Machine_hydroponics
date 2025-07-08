@@ -119,6 +119,8 @@ class HidroponiaUI {
     this.lux.btnOn.disabled = COIL_LUX;
     this.lux.btnOff.disabled = !COIL_LUX;
 
+    this.lux.showPointFux.style.display = COIL_LUX ? `` : `none`;
+
     this.lux.showPointFocus.classList.toggle('active', STATUS_LUX);
   }
 
@@ -169,7 +171,8 @@ class HidroponiaUI {
     this.socket = io();
 
     this.lux = {
-      showPointFocus: document.querySelector('#luminaria .foco .luz'),
+      showPointFocus: document.querySelector('#luminaria .foco'),
+      showPointFux: document.querySelector('#luminaria .luz'),
       showPointIntensity: document.getElementById('luminaria-value'),
       setPoint: document.getElementById('luminaria-sp'),
       btnSave: document.getElementById('guardar-luminaria-sp'),
@@ -413,7 +416,8 @@ class HidroponiaUI {
     this.doping.showPintEC.textContent = data.IREG_TDS_RAW.toFixed(2);
     this.doping.showPointTEMP.textContent = this.#parse_temp(data.IREG_TEMP_RAW).toFixed(2);
 
-    this.lux.showPointFocus.style.boxShadow = `0 0 30px ${this.#scale(data.IREG_LUX, 0, 65535, 5, 20)}px #fff783`;
+    this.lux.showPointFux.style.boxShadow = `0 0 30px ${this.#scale(data.IREG_LUX, 0, 65535, 5, 20)}px #fff783`;
+
     this.lux.showPointIntensity.textContent = data.IREG_LUX.toFixed(2);
 
     this.pump_0.showPointLevel.style.height = data.IREG_DOPING_LEVEL_0 + '%';
@@ -442,6 +446,7 @@ class HidroponiaUI {
       HREG_OFF_MS_PUMP_1,
       HREG_OFF_MS_PUMP_2
     } = this.#dataConfig;
+
 
     if (HREG_LUX_SP !== data.HREG_LUX_SP)
       this.lux.setPoint.value = Math.floor(this.#scale(data.HREG_LUX_SP, 0, 65535, 0, 100));
@@ -489,6 +494,9 @@ class HidroponiaUI {
     // PUMP-3-T-OFF
     if (HREG_OFF_MS_PUMP_2 !== data.HREG_OFF_MS_PUMP_2)
       this.pump_2.setPointTimeOff.value = Math.floor(data.HREG_OFF_MS_PUMP_2 / 1000);
+
+    console.log(this.#dataConfig.COIL_LUX);
+
 
     this.pump_0.showPointBombSpeed.textContent = Math.floor(this.#scale(data.HREG_PUMP_0, 0, 255, 0, 100));
     this.pump_1.showPointBombSpeed.textContent = Math.floor(this.#scale(data.HREG_PUMP_1, 0, 255, 0, 100));
