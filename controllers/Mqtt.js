@@ -11,7 +11,7 @@ const mqtt = require("mqtt");
 /** @typedef {import('../types/types').DataSetMQTT} DataSetMQTT */
 
 class Mqtt {
-  url = 'mqtt://192.168.4.100'; /*'mqtt://test.mosquitto.org'*/
+  url = 'mqtt://192.168.200.100'; /*'mqtt://test.mosquitto.org'*/
 
   /**
    * @template {keyof DataSetMQTT} T

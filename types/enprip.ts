@@ -1,0 +1,40 @@
+type client = "LUaDMKOnvOL2MF43a2sf69DXvuQcq3JpVDxvoEPf14sOMruecN";
+
+type DataSetMQTT = {
+  "RClslUAhsQ1xwSAv1qcxGK3v9PQ0P2Fri1NdS7JScnDUHVZKN/REQ_DATA_STREAM": string;
+
+  "g7bY0q7Pugxr0PtntLUDKp03Qq0Ix9X7o9SC9dVvfNylC4Sx6o/HREG_MODE": string;
+
+  "gEq9ls9ykPNNgldO4NL6BSrpQOinnjVFfPwVIpUxGOB72CBl5X/COIL_LUX": string;
+  "PxtEkab5RJhU15AKksOROz8fLRZxNBu46BHSKZz3Jf7mDqMl2X/COIL_AIR_PUMP": string;
+
+  "zbOYz0gdDXlIM7CRFhyFNi7tSHUt7RWLJ91hpftRubYiPBQ25H/HREG_LUX_PWM": string;
+  "1fqLtnny9PrSwVMFIsNlZcsT7E3PByd4CADdWl4IiQYHSYywES/HREG_LUX_SP": string;
+  "m0oO8kYdByc6WfgMP88XicYMAarsLseLYjkZx9zGKX03yD9XH3/HREG_ON_MS_AIR": string;
+  "SNSnLpYdddAUTCa7aptbS7jwrSmghpfWu0wA0LwTSeSw4E42GN/HREG_OFF_MS_AIR": string;
+
+  "wri6FawZVgXplPYpD1ClB81oZEf5rI4VsfyL94GHXrqJpK30VD/COIL_PUMP_0": string;
+  "xySHEExHfaewzvJakYs0PDjLk04PZFDt9YJHVkLeHU17V6Kg7g/COIL_PUMP_1": string;
+  "y8dbxppKBvx69wgTuY1U6IehxDKNcTfydmXJcO4E2EHCPiA6Nh/COIL_PUMP_2": string;
+
+  "hqj4ttb3eaigYsgLV2m7KaSQcfN5kJiU3PvqfITUAgu736Jhta/HREG_DOPING_SP_0": string;
+  "GkSakMYpEx3BQhcwgNegDiqvDbRuSsTKRKTmuExMudp7r4ovkq/HREG_DOPING_SP_1": string;
+  "rKxhJd0Lry1F8vWExBl7twDowo5EIauN1Ca24LrISb88hRcCCa/HREG_DOPING_SP_2": string;
+
+  "6Fbrbg5YFbFxmkT62VaD3KBoXSNm4WiB8iv7zoclatrWMI6XvS/HREG_PUMP_0": string;
+  "XzP4mGanBHBEFzzf8dehGJ8ToZd6EkWp0EjBBDolhKTaIlnO9i/HREG_PUMP_1": string;
+  "o3dtOkdJT3DyW2qPOPEVBzWZsEk2Iz7ZcXnq461iRUxu3v55aG/HREG_PUMP_2": string;
+
+  "Hx1kYvn1aAQRx43dvX77WPi0Ad2Gx3Bg4GLMh6y2aBuCpxhbxL/HREG_ON_MS_PUMP_0": string;
+  "pJZZDo0HsNFJtmEJtArx2mpVDYJgIOK5851KognKYei5jKUfRI/HREG_ON_MS_PUMP_1": string;
+  "nMYHshmWkiGqWP46KNW5dKDlsCkC6nSzKAc4qEGRjEOKpRR28b/HREG_ON_MS_PUMP_2": string;
+
+  "N2eK4eWasg5kyk9YdPWhas3gYWl7bBD8IWJen64bAWnvQAm9Mb/HREG_OFF_MS_PUMP_0": string;
+  "dqWXqWpORX8M6boeFGIttmbiKWPRzBWB4jRIF2BjNUknB70Hjp/HREG_OFF_MS_PUMP_1": string;
+  "clYgGkFHDGdvY2laGEKaEAIt9wOYeaAdBNkQaLLWuGS08qmMJ8/HREG_OFF_MS_PUMP_2": string;
+}
+
+type DataGetMQTT = {
+  "epRRsLyNRTBLvfYtRwteY3nV5TGQZ9y8bqlvaIY27f3w6GARIy/REFRESH_DATA_STREAM": string;
+  "tUtdKieGNkTKInY7UIljxbCzWDS1g0G4kXh1x0VntQtSFeW5at/REFRESH_DATA_CONFIG": string;
+}

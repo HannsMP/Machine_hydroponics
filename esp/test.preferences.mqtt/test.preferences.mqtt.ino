@@ -80,10 +80,10 @@ void setup() {
     Serial.print(".");
   }
 
-  Serial.println("WiFi conectado. IP:");
+  Serial.print("WiFi conectado. IP: ");
   Serial.println(WiFi.localIP());
 
-  client.setServer("192.168.200.100", 1883);
+  client.setServer("test.mosquitto.org", 1883);
   client.setCallback(callback);
   Serial.println("MQTT configurado.");
 
@@ -96,15 +96,15 @@ void loop() {
   client.loop();
 
   CURRENT_TIME = millis();
-  
+
   // Simulación de sensores en rangos típicos
   D_LUX = random(0, 1000);
   IREG_LUX = max((int)D_LUX, 0);
-  IREG_TDS_RAW = random(200, 800); // ejemplo ppm crudos
-  IREG_PH_RAW = random(400, 600);  // ejemplo voltaje
-  IREG_TEMP_RAW = random(200, 400); // ejemplo 20-40°C *10
-  IREG_LSL = random(0,2); // 0 o 1
-  IREG_LSH = random(0,2);
+  IREG_TDS_RAW = random(200, 800);   // ejemplo ppm crudos
+  IREG_PH_RAW = random(400, 600);    // ejemplo voltaje
+  IREG_TEMP_RAW = random(200, 400);  // ejemplo 20-40°C *10
+  IREG_LSL = random(0, 2);           // 0 o 1
+  IREG_LSH = random(0, 2);
 
   if ((HREG_MODE == 1) && (IREG_LSL == 0))
     controlAutomatico();
@@ -114,10 +114,10 @@ void loop() {
 
 void controlManual() {
   // lux
-  STATUS_LUX = (HREG_LUX_PWM > 0) ? 1 : 0;  
+  STATUS_LUX = (HREG_LUX_PWM > 0) ? 1 : 0;
 
   // air
-  STATUS_AIR = COIL_AIR_PUMP;  
+  STATUS_AIR = COIL_AIR_PUMP;
 
   // bumb
   for (int i = 0; i < NUM_GROUP; i++) {
@@ -197,13 +197,13 @@ void loadPreferences() {
   GROUP_HREG_PUMP[1] = preferences.getInt("HREG_PUMP_1", GROUP_HREG_PUMP[1]);
   GROUP_HREG_PUMP[2] = preferences.getInt("HREG_PUMP_2", GROUP_HREG_PUMP[2]);
 
-  GROUP_ON_MS_PUMP[0] = preferences.getInt("HREG_B0_ON_MS", GROUP_ON_MS_PUMP[0]);
-  GROUP_ON_MS_PUMP[1] = preferences.getInt("HREG_B1_ON_MS", GROUP_ON_MS_PUMP[1]);
-  GROUP_ON_MS_PUMP[2] = preferences.getInt("HREG_B2_ON_MS", GROUP_ON_MS_PUMP[2]);
+  GROUP_ON_MS_PUMP[0] = preferences.getInt("HREG_ON_MS_PUMP_0", GROUP_ON_MS_PUMP[0]);
+  GROUP_ON_MS_PUMP[1] = preferences.getInt("HREG_ON_MS_PUMP_1", GROUP_ON_MS_PUMP[1]);
+  GROUP_ON_MS_PUMP[2] = preferences.getInt("HREG_ON_MS_PUMP_2", GROUP_ON_MS_PUMP[2]);
 
-  GROUP_OFF_MS_PUMP[0] = preferences.getInt("HREG_B0_OFF_MS", GROUP_OFF_MS_PUMP[0]);
-  GROUP_OFF_MS_PUMP[1] = preferences.getInt("HREG_B1_OFF_MS", GROUP_OFF_MS_PUMP[1]);
-  GROUP_OFF_MS_PUMP[2] = preferences.getInt("HREG_B2_OFF_MS", GROUP_OFF_MS_PUMP[2]);
+  GROUP_OFF_MS_PUMP[0] = preferences.getInt("HREG_OFF_MS_PUMP_0", GROUP_OFF_MS_PUMP[0]);
+  GROUP_OFF_MS_PUMP[1] = preferences.getInt("HREG_OFF_MS_PUMP_1", GROUP_OFF_MS_PUMP[1]);
+  GROUP_OFF_MS_PUMP[2] = preferences.getInt("HREG_OFF_MS_PUMP_2", GROUP_OFF_MS_PUMP[2]);
 }
 
 /* 
@@ -247,8 +247,7 @@ void send_data_config() {
   char out[1024];
   serializeJson(doc, out);
 
-  Serial.println("send data config");
-  client.publish("control/REFRESH_DATA_CONFIG", out);
+  client.publish("tUtdKieGNkTKInY7UIljxbCzWDS1g0G4kXh1x0VntQtSFeW5at", out);
 }
 
 void send_data_stream() {
@@ -281,8 +280,7 @@ void send_data_stream() {
   char out[1024];
   serializeJson(doc, out);
 
-  Serial.println("send data stream");
-  client.publish("control/REFRESH_DATA_STREAM", out);
+  client.publish("epRRsLyNRTBLvfYtRwteY3nV5TGQZ9y8bqlvaIY27f3w6GARIy", out);
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -292,68 +290,69 @@ void callback(char* topic, byte* payload, unsigned int length) {
   int rawValue = msg.toInt();
   int value = max(rawValue, 0);
 
-  Serial.println(t + ": " + value);
+  Serial.println(t);
+  Serial.print(value);
 
-  if (t == "control/REQ_DATA_STREAM") {
+  if (t == "RClslUAhsQ1xwSAv1qcxGK3v9PQ0P2Fri1NdS7JScnDUHVZKN/REQ_DATA_STREAM") {
     send_data_stream();
   } else {
 
-    if (t == "control/HREG_MODE") {
+    if (t == "g7bY0q7Pugxr0PtntLUDKp03Qq0Ix9X7o9SC9dVvfNylC4Sx6o/HREG_MODE") {
       preferences.putInt("HREG_MODE", (HREG_MODE = value == 0 ? 0 : 1));
-    } else if (t == "control/COIL_LUX") {
+    } else if (t == "gEq9ls9ykPNNgldO4NL6BSrpQOinnjVFfPwVIpUxGOB72CBl5X/COIL_LUX") {
       preferences.putInt("COIL_LUX", (COIL_LUX = value == 0 ? 0 : 1));
-    } else if (t == "control/COIL_AIR_PUMP") {
+    } else if (t == "PxtEkab5RJhU15AKksOROz8fLRZxNBu46BHSKZz3Jf7mDqMl2X/COIL_AIR_PUMP") {
       preferences.putInt("COIL_AIR_PUMP", (COIL_AIR_PUMP = value == 0 ? 0 : 1));
     }
 
-    else if (t == "control/HREG_LUX_PWM") {
+    else if (t == "zbOYz0gdDXlIM7CRFhyFNi7tSHUt7RWLJ91hpftRubYiPBQ25H/HREG_LUX_PWM") {
       preferences.putInt("HREG_LUX_PWM", (HREG_LUX_PWM = min(value, 255)));
-    } else if (t == "control/HREG_LUX_SP") {
+    } else if (t == "1fqLtnny9PrSwVMFIsNlZcsT7E3PByd4CADdWl4IiQYHSYywES/HREG_LUX_SP") {
       preferences.putInt("HREG_LUX_SP", (HREG_LUX_SP = min(value, 65535)));
-    } else if (t == "control/HREG_ON_MS_AIR") {
+    } else if (t == "m0oO8kYdByc6WfgMP88XicYMAarsLseLYjkZx9zGKX03yD9XH3/HREG_ON_MS_AIR") {
       preferences.putInt("HREG_ON_MS_AIR", (HREG_ON_MS_AIR = value));
-    } else if (t == "control/HREG_OFF_MS_AIR") {
+    } else if (t == "SNSnLpYdddAUTCa7aptbS7jwrSmghpfWu0wA0LwTSeSw4E42GN/HREG_OFF_MS_AIR") {
       preferences.putInt("HREG_OFF_MS_AIR", (HREG_OFF_MS_AIR = value));
     }
 
-    else if (t == "control/COIL_PUMP_0") {
+    else if (t == "wri6FawZVgXplPYpD1ClB81oZEf5rI4VsfyL94GHXrqJpK30VD/COIL_PUMP_0") {
       preferences.putInt("COIL_PUMP_0", (GROUP_COIL_PUMP[0] = value == 0 ? 0 : 1));
-    } else if (t == "control/COIL_PUMP_1") {
+    } else if (t == "xySHEExHfaewzvJakYs0PDjLk04PZFDt9YJHVkLeHU17V6Kg7g/COIL_PUMP_1") {
       preferences.putInt("COIL_PUMP_1", (GROUP_COIL_PUMP[1] = value == 0 ? 0 : 1));
-    } else if (t == "control/COIL_PUMP_2") {
+    } else if (t == "y8dbxppKBvx69wgTuY1U6IehxDKNcTfydmXJcO4E2EHCPiA6Nh/COIL_PUMP_2") {
       preferences.putInt("COIL_PUMP_2", (GROUP_COIL_PUMP[2] = value == 0 ? 0 : 1));
     }
 
-    else if (t == "control/HREG_DOPING_SP_0") {
+    else if (t == "hqj4ttb3eaigYsgLV2m7KaSQcfN5kJiU3PvqfITUAgu736Jhta/HREG_DOPING_SP_0") {
       preferences.putInt("HREG_DOPING_SP_0", (GROUP_HREG_DOPING_SP[0] = min(value, 4095)));
-    } else if (t == "control/HREG_DOPING_SP_1") {
+    } else if (t == "GkSakMYpEx3BQhcwgNegDiqvDbRuSsTKRKTmuExMudp7r4ovkq/HREG_DOPING_SP_1") {
       preferences.putInt("HREG_DOPING_SP_1", (GROUP_HREG_DOPING_SP[1] = min(value, 4095)));
-    } else if (t == "control/HREG_DOPING_SP_2") {
+    } else if (t == "rKxhJd0Lry1F8vWExBl7twDowo5EIauN1Ca24LrISb88hRcCCa/HREG_DOPING_SP_2") {
       preferences.putInt("HREG_DOPING_SP_2", (GROUP_HREG_DOPING_SP[2] = min(value, 4095)));
     }
 
-    else if (t == "control/HREG_PUMP_0") {
+    else if (t == "6Fbrbg5YFbFxmkT62VaD3KBoXSNm4WiB8iv7zoclatrWMI6XvS/HREG_PUMP_0") {
       preferences.putInt("HREG_PUMP_0", (GROUP_HREG_PUMP[0] = min(value, 255)));
-    } else if (t == "control/HREG_PUMP_1") {
+    } else if (t == "XzP4mGanBHBEFzzf8dehGJ8ToZd6EkWp0EjBBDolhKTaIlnO9i/HREG_PUMP_1") {
       preferences.putInt("HREG_PUMP_1", (GROUP_HREG_PUMP[1] = min(value, 255)));
-    } else if (t == "control/HREG_PUMP_2") {
+    } else if (t == "o3dtOkdJT3DyW2qPOPEVBzWZsEk2Iz7ZcXnq461iRUxu3v55aG/HREG_PUMP_2") {
       preferences.putInt("HREG_PUMP_2", (GROUP_HREG_PUMP[2] = min(value, 255)));
     }
 
-    else if (t == "control/HREG_B0_ON_MS") {
-      preferences.putInt("HREG_B0_ON_MS", (GROUP_ON_MS_PUMP[0] = value * 1000));
-    } else if (t == "control/HREG_B1_ON_MS") {
-      preferences.putInt("HREG_B1_ON_MS", (GROUP_ON_MS_PUMP[1] = value * 1000));
-    } else if (t == "control/HREG_B2_ON_MS") {
-      preferences.putInt("HREG_B2_ON_MS", (GROUP_ON_MS_PUMP[2] = value * 1000));
+    else if (t == "Hx1kYvn1aAQRx43dvX77WPi0Ad2Gx3Bg4GLMh6y2aBuCpxhbxL/HREG_ON_MS_PUMP_0") {
+      preferences.putInt("HREG_ON_MS_PUMP_0", (GROUP_ON_MS_PUMP[0] = value * 1000));
+    } else if (t == "pJZZDo0HsNFJtmEJtArx2mpVDYJgIOK5851KognKYei5jKUfRI/HREG_ON_MS_PUMP_1") {
+      preferences.putInt("HREG_ON_MS_PUMP_1", (GROUP_ON_MS_PUMP[1] = value * 1000));
+    } else if (t == "nMYHshmWkiGqWP46KNW5dKDlsCkC6nSzKAc4qEGRjEOKpRR28b/HREG_ON_MS_PUMP_2") {
+      preferences.putInt("HREG_ON_MS_PUMP_2", (GROUP_ON_MS_PUMP[2] = value * 1000));
     }
 
-    else if (t == "control/HREG_B0_OFF_MS") {
-      preferences.putInt("HREG_B0_OFF_MS", (GROUP_OFF_MS_PUMP[0] = value * 1000));
-    } else if (t == "control/HREG_B1_OFF_MS") {
-      preferences.putInt("HREG_B1_OFF_MS", (GROUP_OFF_MS_PUMP[1] = value * 1000));
-    } else if (t == "control/HREG_B2_OFF_MS") {
-      preferences.putInt("HREG_B2_OFF_MS", (GROUP_OFF_MS_PUMP[2] = value * 1000));
+    else if (t == "N2eK4eWasg5kyk9YdPWhas3gYWl7bBD8IWJen64bAWnvQAm9Mb/HREG_OFF_MS_PUMP_0") {
+      preferences.putInt("HREG_OFF_MS_PUMP_0", (GROUP_OFF_MS_PUMP[0] = value * 1000));
+    } else if (t == "dqWXqWpORX8M6boeFGIttmbiKWPRzBWB4jRIF2BjNUknB70Hjp/HREG_OFF_MS_PUMP_1") {
+      preferences.putInt("HREG_OFF_MS_PUMP_1", (GROUP_OFF_MS_PUMP[1] = value * 1000));
+    } else if (t == "clYgGkFHDGdvY2laGEKaEAIt9wOYeaAdBNkQaLLWuGS08qmMJ8/HREG_OFF_MS_PUMP_2") {
+      preferences.putInt("HREG_OFF_MS_PUMP_2", (GROUP_OFF_MS_PUMP[2] = value * 1000));
     }
 
     send_data_config();
@@ -362,38 +361,42 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 void reconnect() {
   while (!client.connected()) {
-    if (!client.connect("ESP32_Client")) {
+    Serial.println("Conectando");
+    if (!client.connect("LUaDMKOnvOL2MF43a2sf69DXvuQcq3JpVDxvoEPf14sOMruecN")) {
       delay(5000);
       continue;
+      Serial.print(".");
     }
 
-    client.subscribe("control/REQ_DATA_STREAM");
-    client.subscribe("control/HREG_MODE");
-    client.subscribe("control/COIL_LUX");
-    client.subscribe("control/COIL_AIR_PUMP");
-    client.subscribe("control/HREG_LUX_PWM");
-    client.subscribe("control/HREG_LUX_SP");
-    client.subscribe("control/HREG_ON_MS_AIR");
-    client.subscribe("control/HREG_OFF_MS_AIR");
+    Serial.println("Cliente Conectado");
 
-    client.subscribe("control/COIL_PUMP_0");
-    client.subscribe("control/COIL_PUMP_1");
-    client.subscribe("control/COIL_PUMP_2");
+    client.subscribe("RClslUAhsQ1xwSAv1qcxGK3v9PQ0P2Fri1NdS7JScnDUHVZKN/REQ_DATA_STREAM");
+    client.subscribe("g7bY0q7Pugxr0PtntLUDKp03Qq0Ix9X7o9SC9dVvfNylC4Sx6o/HREG_MODE");
+    client.subscribe("gEq9ls9ykPNNgldO4NL6BSrpQOinnjVFfPwVIpUxGOB72CBl5X/COIL_LUX");
+    client.subscribe("PxtEkab5RJhU15AKksOROz8fLRZxNBu46BHSKZz3Jf7mDqMl2X/COIL_AIR_PUMP");
+    client.subscribe("zbOYz0gdDXlIM7CRFhyFNi7tSHUt7RWLJ91hpftRubYiPBQ25H/HREG_LUX_PWM");
+    client.subscribe("1fqLtnny9PrSwVMFIsNlZcsT7E3PByd4CADdWl4IiQYHSYywES/HREG_LUX_SP");
+    client.subscribe("m0oO8kYdByc6WfgMP88XicYMAarsLseLYjkZx9zGKX03yD9XH3/HREG_ON_MS_AIR");
+    client.subscribe("SNSnLpYdddAUTCa7aptbS7jwrSmghpfWu0wA0LwTSeSw4E42GN/HREG_OFF_MS_AIR");
 
-    client.subscribe("control/HREG_DOPING_SP_0");
-    client.subscribe("control/HREG_DOPING_SP_1");
-    client.subscribe("control/HREG_DOPING_SP_2");
+    client.subscribe("wri6FawZVgXplPYpD1ClB81oZEf5rI4VsfyL94GHXrqJpK30VD/COIL_PUMP_0");
+    client.subscribe("xySHEExHfaewzvJakYs0PDjLk04PZFDt9YJHVkLeHU17V6Kg7g/COIL_PUMP_1");
+    client.subscribe("y8dbxppKBvx69wgTuY1U6IehxDKNcTfydmXJcO4E2EHCPiA6Nh/COIL_PUMP_2");
 
-    client.subscribe("control/HREG_PUMP_0");
-    client.subscribe("control/HREG_PUMP_1");
-    client.subscribe("control/HREG_PUMP_2");
+    client.subscribe("hqj4ttb3eaigYsgLV2m7KaSQcfN5kJiU3PvqfITUAgu736Jhta/HREG_DOPING_SP_0");
+    client.subscribe("GkSakMYpEx3BQhcwgNegDiqvDbRuSsTKRKTmuExMudp7r4ovkq/HREG_DOPING_SP_1");
+    client.subscribe("rKxhJd0Lry1F8vWExBl7twDowo5EIauN1Ca24LrISb88hRcCCa/HREG_DOPING_SP_2");
 
-    client.subscribe("control/HREG_B0_ON_MS");
-    client.subscribe("control/HREG_B1_ON_MS");
-    client.subscribe("control/HREG_B2_ON_MS");
+    client.subscribe("6Fbrbg5YFbFxmkT62VaD3KBoXSNm4WiB8iv7zoclatrWMI6XvS/HREG_PUMP_0");
+    client.subscribe("XzP4mGanBHBEFzzf8dehGJ8ToZd6EkWp0EjBBDolhKTaIlnO9i/HREG_PUMP_1");
+    client.subscribe("o3dtOkdJT3DyW2qPOPEVBzWZsEk2Iz7ZcXnq461iRUxu3v55aG/HREG_PUMP_2");
 
-    client.subscribe("control/HREG_B0_OFF_MS");
-    client.subscribe("control/HREG_B1_OFF_MS");
-    client.subscribe("control/HREG_B2_OFF_MS");
+    client.subscribe("Hx1kYvn1aAQRx43dvX77WPi0Ad2Gx3Bg4GLMh6y2aBuCpxhbxL/HREG_ON_MS_PUMP_0");
+    client.subscribe("pJZZDo0HsNFJtmEJtArx2mpVDYJgIOK5851KognKYei5jKUfRI/HREG_ON_MS_PUMP_1");
+    client.subscribe("nMYHshmWkiGqWP46KNW5dKDlsCkC6nSzKAc4qEGRjEOKpRR28b/HREG_ON_MS_PUMP_2");
+
+    client.subscribe("N2eK4eWasg5kyk9YdPWhas3gYWl7bBD8IWJen64bAWnvQAm9Mb/HREG_OFF_MS_PUMP_0");
+    client.subscribe("dqWXqWpORX8M6boeFGIttmbiKWPRzBWB4jRIF2BjNUknB70Hjp/HREG_OFF_MS_PUMP_1");
+    client.subscribe("clYgGkFHDGdvY2laGEKaEAIt9wOYeaAdBNkQaLLWuGS08qmMJ8/HREG_OFF_MS_PUMP_2");
   }
 }

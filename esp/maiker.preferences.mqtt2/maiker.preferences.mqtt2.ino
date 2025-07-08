@@ -1,12 +1,13 @@
+
 #include <WiFi.h>
 #include <PubSubClient.h>
-#include "Adafruit_VEML7700.h"
+//#include "Adafruit_VEML7700.h"
 #include <PID_v1.h>
 #include <ArduinoJson.h>
 #include <Preferences.h>
 
 Preferences preferences;
-Adafruit_VEML7700 veml = Adafruit_VEML7700();
+//Adafruit_VEML7700 veml = Adafruit_VEML7700();
 
 const int NUM_GROUP = 3;
 
@@ -92,7 +93,7 @@ void setup() {
   preferences.begin("controller", false);
   loadPreferences();
 
-  WiFi.begin("ESP32_AP", "12345678");
+  WiFi.begin("REHF-2.4G", "tontosYtorpes291");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -101,15 +102,15 @@ void setup() {
   Serial.println("WiFi conectado. IP:");
   Serial.println(WiFi.localIP());
 
-  client.setServer("192.168.4.100", 1883);
+  client.setServer("192.168.200.100", 1883);
   client.setCallback(callback);
 
   Serial.println("MQTT conectado");
 
-  veml.begin();
+  /*veml.begin();
   veml.setLowThreshold(10000);
   veml.setHighThreshold(20000);
-  veml.interruptEnable(true);
+  veml.interruptEnable(true);*/
 
   LUX_PID.SetOutputLimits(0, 255);
   LUX_PID.SetMode(AUTOMATIC);
@@ -132,11 +133,11 @@ void loop() {
   client.loop();
 
   CURRENT_TIME = millis();
-  D_LUX = veml.readLux();
+  D_LUX = 2000;
   IREG_LUX = max((int)D_LUX, 0);
-  IREG_TDS_RAW = analogRead(TDS_PIN);
-  IREG_PH_RAW = analogRead(PH_PIN);
-  IREG_TEMP_RAW = analogRead(TEMP_PIN);
+  IREG_TDS_RAW = 1500;
+  IREG_PH_RAW = 3050;
+  IREG_TEMP_RAW = 2400;
   IREG_LSL = digitalRead(LSL_PIN);
   IREG_LSH = digitalRead(LSH_PIN);
 
